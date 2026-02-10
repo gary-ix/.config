@@ -1,0 +1,43 @@
+# https://ghostty.org/docs/config/reference
+#macos-titlebar-style = transparent
+macos-titlebar-style = transparent
+macos-icon = chalkboard
+theme = Gruvbox Dark Hard
+window-save-state = always
+background-opacity = 0.85
+background-blur = 99
+adjust-cell-height = 5%
+cursor-style = bar
+font-family = JetBrainsMono Nerd Font
+font-size = 15 
+focus-follows-mouse = true
+macos-window-buttons = hidden
+copy-on-select = true
+unfocused-split-opacity = 1
+
+
+# Pane navigation
+keybind = super+alt+arrow_left=unbind
+keybind = super+alt+arrow_down=unbind
+keybind = super+alt+arrow_up=unbind
+keybind = super+alt+arrow_right=unbind
+keybind = cmd+h=goto_split:left
+keybind = cmd+j=goto_split:down
+keybind = cmd+k=goto_split:up
+keybind = cmd+l=goto_split:right
+
+# Pane creation
+keybind = super+d=unbind
+keybind = super+shift+d=unbind
+keybind = cmd+shift+h=new_split:left
+keybind = cmd+shift+j=new_split:down
+keybind = cmd+shift+k=new_split:up
+keybind = cmd+shift+l=new_split:right
+
+# quick terminal
+# keybind = global:ctrl+shift+alt+t=toggle_quick_terminal
+# quick-terminal-animation-duration = 0.01
+# quick-terminal-position = center
+# quick-terminal-size = 60%,60%
+# quick-terminal-screen = macos-menu-bar
+# quick-terminal-autohide = false
