@@ -41,6 +41,24 @@
                         ]
                     },
                     {
+                        "description": "Map Alt+C to Ctrl+C",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "c",
+                                    "modifiers": { "mandatory": ["right_option"] }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "c",
+                                        "modifiers": ["left_control"]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "Map Command+Spacebar to Control+Spacebar",
                         "enabled": false,
                         "manipulators": [
