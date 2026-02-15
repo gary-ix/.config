@@ -3,9 +3,8 @@ local user_bg="#656675"
 local user_fg="#101316"
 local path_bg="#C6C7D8"
 local path_fg="#101316"
-local info_color="#C99824"
 local muted_color="#656675"
-local prompt_color="#C99824"
+local prompt_color="#656675"
 
 function prompt_context_line() {
   print -nr -- "%K{${user_bg}}%F{${user_fg}} ⌘ %n %k%f%K{${path_bg}}%F{${path_fg}} %~ %k%f"
@@ -20,7 +19,7 @@ function prompt_git_line() {
   local -i ahead behind
   folder="${PWD:t}"
   branch=$(parse_git_branch)
-  git_line="%F{${info_color}}${folder}"
+  git_line="${folder}"
 
   if [[ -n "$branch" ]]; then
     ahead=0
@@ -39,12 +38,11 @@ function prompt_git_line() {
     (( behind > 0 )) && git_line+=" ↓${behind}"
   fi
 
-  git_line+="%f"
   print -nr -- "$git_line"
 }
 
 function prompt_input_line() {
-  print -nr -- "%F{${muted_color}}○%f %F{${prompt_color}}❯%f"
+  print -nr -- "%F{${muted_color}}%f%F{${path_bg}}❯%f"
 }
 
 PROMPT='$(prompt_context_line)
