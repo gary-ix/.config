@@ -30,19 +30,14 @@
 	"contributes": {
 		"themes": [
 			{
-				"label": "Light",
+				"label": "gtheme-light",
 				"uiTheme": "vs",
-				"path": "./themes/light.json"
+				"path": "./themes/gtheme-light.json"
 			},
 			{
-				"label": "Dark",
+				"label": "gtheme-dark",
 				"uiTheme": "vs-dark",
-				"path": "./themes/dark.json"
-			},
-			{
-				"label": "Tradester-Dark",
-				"uiTheme": "vs-dark",
-				"path": "./themes/tradester-dark.json"
+				"path": "./themes/gtheme-dark.json"
 			}
 		]
 	}

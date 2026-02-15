@@ -1,0 +1,253 @@
+{
+  "$schema": "https://opencode.ai/theme.json",
+  "defs": {
+    "dark_bg": "#101316",
+    "dark_panel": "#262838",
+    "dark_element": "#101316",
+    "dark_text": "#D9DAEC",
+    "dark_muted": "#656675",
+    "dark_border": "#262838",
+    "dark_border_active": "#C6C7D8",
+    "dark_primary": "#83A598",
+    "dark_secondary": "#689D6A",
+    "dark_accent": "#FABD2F",
+    "dark_error": "#CC241D",
+    "dark_warning": "#D79921",
+    "dark_success": "#B8BB26",
+    "dark_info": "#458588",
+    "dark_comment": "#7F858B",
+    "dark_keyword": "#FB4934",
+    "dark_function": "#8EC07C",
+    "dark_variable": "#83A598",
+    "dark_string": "#B8BB26",
+    "dark_number": "#D3869B",
+    "dark_type": "#FABD2F",
+    "dark_operator": "#8EC07C",
+    "dark_punctuation": "#BAB09E",
+    "light_bg": "#F4F4F9",
+    "light_panel": "#FDFDFD",
+    "light_element": "#D9DAEC",
+    "light_text": "#101316",
+    "light_muted": "#656675",
+    "light_border": "#C6C7D8",
+    "light_border_active": "#262838",
+    "light_primary": "#5F8F8E",
+    "light_secondary": "#5A8D60",
+    "light_accent": "#C99824",
+    "light_error": "#BE2F27",
+    "light_warning": "#C36A10",
+    "light_success": "#8B9120",
+    "light_info": "#4F7F83",
+    "light_comment": "#7A7068",
+    "light_keyword": "#C43B2D",
+    "light_function": "#6FA05A",
+    "light_variable": "#5F8F8E",
+    "light_string": "#8B9120",
+    "light_number": "#AD6E88",
+    "light_type": "#C99824",
+    "light_operator": "#6FA05A",
+    "light_punctuation": "#4A4440"
+  },
+  "theme": {
+    "primary": {
+      "dark": "dark_primary",
+      "light": "light_primary"
+    },
+    "secondary": {
+      "dark": "dark_secondary",
+      "light": "light_secondary"
+    },
+    "accent": {
+      "dark": "dark_accent",
+      "light": "light_accent"
+    },
+    "error": {
+      "dark": "dark_error",
+      "light": "light_error"
+    },
+    "warning": {
+      "dark": "dark_warning",
+      "light": "light_warning"
+    },
+    "success": {
+      "dark": "dark_success",
+      "light": "light_success"
+    },
+    "info": {
+      "dark": "dark_info",
+      "light": "light_info"
+    },
+    "text": {
+      "dark": "dark_text",
+      "light": "light_text"
+    },
+    "textMuted": {
+      "dark": "dark_muted",
+      "light": "light_muted"
+    },
+    "background": {
+      "dark": "dark_bg",
+      "light": "light_bg"
+    },
+    "backgroundPanel": {
+      "dark": "dark_panel",
+      "light": "light_panel"
+    },
+    "backgroundElement": {
+      "dark": "dark_element",
+      "light": "light_element"
+    },
+    "border": {
+      "dark": "dark_border",
+      "light": "light_border"
+    },
+    "borderActive": {
+      "dark": "dark_border_active",
+      "light": "light_border_active"
+    },
+    "borderSubtle": {
+      "dark": "dark_border",
+      "light": "light_border"
+    },
+    "diffAdded": {
+      "dark": "dark_success",
+      "light": "light_success"
+    },
+    "diffRemoved": {
+      "dark": "dark_error",
+      "light": "light_error"
+    },
+    "diffContext": {
+      "dark": "dark_muted",
+      "light": "light_muted"
+    },
+    "diffHunkHeader": {
+      "dark": "dark_info",
+      "light": "light_info"
+    },
+    "diffHighlightAdded": {
+      "dark": "dark_success",
+      "light": "light_success"
+    },
+    "diffHighlightRemoved": {
+      "dark": "dark_error",
+      "light": "light_error"
+    },
+    "diffAddedBg": {
+      "dark": "dark_panel",
+      "light": "light_element"
+    },
+    "diffRemovedBg": {
+      "dark": "dark_panel",
+      "light": "light_element"
+    },
+    "diffContextBg": {
+      "dark": "dark_bg",
+      "light": "light_bg"
+    },
+    "diffLineNumber": {
+      "dark": "dark_muted",
+      "light": "light_muted"
+    },
+    "diffAddedLineNumberBg": {
+      "dark": "dark_panel",
+      "light": "light_element"
+    },
+    "diffRemovedLineNumberBg": {
+      "dark": "dark_panel",
+      "light": "light_element"
+    },
+    "markdownText": {
+      "dark": "dark_text",
+      "light": "light_text"
+    },
+    "markdownHeading": {
+      "dark": "dark_accent",
+      "light": "light_accent"
+    },
+    "markdownLink": {
+      "dark": "dark_primary",
+      "light": "light_primary"
+    },
+    "markdownLinkText": {
+      "dark": "dark_secondary",
+      "light": "light_secondary"
+    },
+    "markdownCode": {
+      "dark": "dark_string",
+      "light": "light_string"
+    },
+    "markdownBlockQuote": {
+      "dark": "dark_muted",
+      "light": "light_muted"
+    },
+    "markdownEmph": {
+      "dark": "dark_warning",
+      "light": "light_warning"
+    },
+    "markdownStrong": {
+      "dark": "dark_accent",
+      "light": "light_accent"
+    },
+    "markdownHorizontalRule": {
+      "dark": "dark_border",
+      "light": "light_border"
+    },
+    "markdownListItem": {
+      "dark": "dark_primary",
+      "light": "light_primary"
+    },
+    "markdownListEnumeration": {
+      "dark": "dark_info",
+      "light": "light_info"
+    },
+    "markdownImage": {
+      "dark": "dark_primary",
+      "light": "light_primary"
+    },
+    "markdownImageText": {
+      "dark": "dark_secondary",
+      "light": "light_secondary"
+    },
+    "markdownCodeBlock": {
+      "dark": "dark_text",
+      "light": "light_text"
+    },
+    "syntaxComment": {
+      "dark": "dark_comment",
+      "light": "light_comment"
+    },
+    "syntaxKeyword": {
+      "dark": "dark_keyword",
+      "light": "light_keyword"
+    },
+    "syntaxFunction": {
+      "dark": "dark_function",
+      "light": "light_function"
+    },
+    "syntaxVariable": {
+      "dark": "dark_variable",
+      "light": "light_variable"
+    },
+    "syntaxString": {
+      "dark": "dark_string",
+      "light": "light_string"
+    },
+    "syntaxNumber": {
+      "dark": "dark_number",
+      "light": "light_number"
+    },
+    "syntaxType": {
+      "dark": "dark_type",
+      "light": "light_type"
+    },
+    "syntaxOperator": {
+      "dark": "dark_operator",
+      "light": "light_operator"
+    },
+    "syntaxPunctuation": {
+      "dark": "dark_punctuation",
+      "light": "light_punctuation"
+    }
+  }
+}

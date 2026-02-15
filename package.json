@@ -1,0 +1,13 @@
+{
+  "name": "dotfiles-root",
+  "private": true,
+  "scripts": {
+    "theme": "tsx custom-themes/create/controller.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.1",
+    "jsonc-parser": "^3.3.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.2"
+  }
+}
