@@ -12,7 +12,8 @@
 		"vscode": "^1.45.0"
 	},
 	"scripts": {
-		"build": "vsce package",
+		"build": "vsce package && npm run install:cursor",
+		"install:cursor": "ELECTRON_RUN_AS_NODE=1 \"/Applications/Cursor.app/Contents/MacOS/Cursor\" \"/Applications/Cursor.app/Contents/Resources/app/out/cli.js\" --install-extension \"./vscode-themes-$npm_package_version.vsix\" --force",
 		"deploy": "vsce publish"
 	},
 	"keywords": [
@@ -33,7 +34,7 @@
 				"uiTheme": "vs",
 				"path": "./themes/light.json"
 			},
-            {
+			{
 				"label": "Dark",
 				"uiTheme": "vs-dark",
 				"path": "./themes/dark.json"
