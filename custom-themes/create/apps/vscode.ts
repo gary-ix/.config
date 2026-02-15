@@ -1,16 +1,17 @@
 import { PATHS } from "../paths"
 import type { CreateInstallModule, ThemeTokens, Variant } from "../types"
-import { installFile, readJsonc, writeJson } from "../utils"
+import { deriveTerminalAnsi, installFile, readJsonc, writeJson } from "../utils"
 
 function updateVscodeTheme(theme: any, variant: Variant, modeLabel: string) {
   const output = JSON.parse(JSON.stringify(theme))
   output.name = modeLabel
   output.colors = output.colors || {}
+  const terminalAnsi = deriveTerminalAnsi(variant)
 
-  const blueHighlight = `${variant.ansi.blue}14`
-  const blueHighlightStrong = `${variant.ansi.blue}1F`
-  const blueHighlightSoft = `${variant.ansi.blue}10`
-  const blueHighlightBorder = `${variant.ansi.blue}38`
+  const blueHighlight = `${terminalAnsi.blue}14`
+  const blueHighlightStrong = `${terminalAnsi.blue}1F`
+  const blueHighlightSoft = `${terminalAnsi.blue}10`
+  const blueHighlightBorder = `${terminalAnsi.blue}38`
 
   output.colors["editor.background"] = variant.background
   output.colors["editor.foreground"] = variant.foreground
@@ -32,22 +33,22 @@ function updateVscodeTheme(theme: any, variant: Variant, modeLabel: string) {
   output.colors["editor.lineHighlightBackground"] = blueHighlightSoft
   output.colors["terminal.background"] = variant.background
   output.colors["terminal.foreground"] = variant.foreground
-  output.colors["terminal.ansiBlack"] = variant.ansi.black
-  output.colors["terminal.ansiRed"] = variant.ansi.red
-  output.colors["terminal.ansiGreen"] = variant.ansi.green
-  output.colors["terminal.ansiYellow"] = variant.ansi.yellow
-  output.colors["terminal.ansiBlue"] = variant.ansi.blue
-  output.colors["terminal.ansiMagenta"] = variant.ansi.magenta
-  output.colors["terminal.ansiCyan"] = variant.ansi.cyan
-  output.colors["terminal.ansiWhite"] = variant.ansi.white
-  output.colors["terminal.ansiBrightBlack"] = variant.ansi.brightBlack
-  output.colors["terminal.ansiBrightRed"] = variant.ansi.brightRed
-  output.colors["terminal.ansiBrightGreen"] = variant.ansi.brightGreen
-  output.colors["terminal.ansiBrightYellow"] = variant.ansi.brightYellow
-  output.colors["terminal.ansiBrightBlue"] = variant.ansi.brightBlue
-  output.colors["terminal.ansiBrightMagenta"] = variant.ansi.brightMagenta
-  output.colors["terminal.ansiBrightCyan"] = variant.ansi.brightCyan
-  output.colors["terminal.ansiBrightWhite"] = variant.ansi.brightWhite
+  output.colors["terminal.ansiBlack"] = terminalAnsi.black
+  output.colors["terminal.ansiRed"] = terminalAnsi.red
+  output.colors["terminal.ansiGreen"] = terminalAnsi.green
+  output.colors["terminal.ansiYellow"] = terminalAnsi.yellow
+  output.colors["terminal.ansiBlue"] = terminalAnsi.blue
+  output.colors["terminal.ansiMagenta"] = terminalAnsi.magenta
+  output.colors["terminal.ansiCyan"] = terminalAnsi.cyan
+  output.colors["terminal.ansiWhite"] = terminalAnsi.white
+  output.colors["terminal.ansiBrightBlack"] = terminalAnsi.brightBlack
+  output.colors["terminal.ansiBrightRed"] = terminalAnsi.brightRed
+  output.colors["terminal.ansiBrightGreen"] = terminalAnsi.brightGreen
+  output.colors["terminal.ansiBrightYellow"] = terminalAnsi.brightYellow
+  output.colors["terminal.ansiBrightBlue"] = terminalAnsi.brightBlue
+  output.colors["terminal.ansiBrightMagenta"] = terminalAnsi.brightMagenta
+  output.colors["terminal.ansiBrightCyan"] = terminalAnsi.brightCyan
+  output.colors["terminal.ansiBrightWhite"] = terminalAnsi.brightWhite
 
   return output
 }
