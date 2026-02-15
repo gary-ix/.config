@@ -6,7 +6,7 @@ function updateVscodeTheme(theme: any, variant: Variant, modeLabel: string) {
   const output = JSON.parse(JSON.stringify(theme))
   output.name = modeLabel
   output.colors = output.colors || {}
-  const terminalAnsi = deriveTerminalAnsi(variant)
+  const terminalAnsi = deriveTerminalAnsi(variant);
 
   const blueHighlight = `${terminalAnsi.blue}14`
   const blueHighlightStrong = `${terminalAnsi.blue}1F`
@@ -31,6 +31,11 @@ function updateVscodeTheme(theme: any, variant: Variant, modeLabel: string) {
   output.colors["editor.hoverHighlightBackground"] = blueHighlightSoft
   output.colors["editor.findRangeHighlightBackground"] = blueHighlightSoft
   output.colors["editor.lineHighlightBackground"] = blueHighlightSoft
+  output.colors["errorForeground"] = variant.error
+  output.colors["editorError.foreground"] = variant.error
+  output.colors["editorWarning.foreground"] = variant.borderActive
+  output.colors["editorInfo.foreground"] = variant.info
+  output.colors["editorHint.foreground"] = variant.success
   output.colors["terminal.background"] = variant.background
   output.colors["terminal.foreground"] = variant.foreground
   output.colors["terminal.ansiBlack"] = terminalAnsi.black

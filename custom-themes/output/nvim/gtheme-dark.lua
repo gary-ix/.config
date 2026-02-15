@@ -33,7 +33,7 @@ M.setup = function()
   type = "#FABD2F",
   variable = "#83A598",
   operator = "#8EC07C",
-  punctuation = "#BAB09E",
+  punctuation = "#cec7ba",
   cursor = "#D9DAEC",
   selection = "#262838"
 },
@@ -52,7 +52,7 @@ M.setup = function()
   warning = "#C36A10",
   success = "#8B9120",
   info = "#4F7F83",
-  comment = "#7A7068",
+  comment = "#797567",
   keyword = "#C43B2D",
   fn = "#6FA05A",
   method = "#5A8D60",
@@ -61,7 +61,7 @@ M.setup = function()
   type = "#C99824",
   variable = "#5F8F8E",
   operator = "#6FA05A",
-  punctuation = "#4A4440",
+  punctuation = "#33302e",
   cursor = "#050607",
   selection = "#D9DAEC"
 }

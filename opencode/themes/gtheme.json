@@ -23,7 +23,7 @@
     "dark_number": "#D3869B",
     "dark_type": "#FABD2F",
     "dark_operator": "#8EC07C",
-    "dark_punctuation": "#BAB09E",
+    "dark_punctuation": "#cec7ba",
     "light_bg": "#F4F4F9",
     "light_panel": "#FDFDFD",
     "light_element": "#D9DAEC",
@@ -38,7 +38,7 @@
     "light_warning": "#C36A10",
     "light_success": "#8B9120",
     "light_info": "#4F7F83",
-    "light_comment": "#7A7068",
+    "light_comment": "#797567",
     "light_keyword": "#C43B2D",
     "light_function": "#6FA05A",
     "light_variable": "#5F8F8E",
@@ -46,7 +46,7 @@
     "light_number": "#AD6E88",
     "light_type": "#C99824",
     "light_operator": "#6FA05A",
-    "light_punctuation": "#4A4440"
+    "light_punctuation": "#33302e"
   },
   "theme": {
     "primary": {
