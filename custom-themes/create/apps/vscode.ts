@@ -7,10 +7,29 @@ function updateVscodeTheme(theme: any, variant: Variant, modeLabel: string) {
   output.name = modeLabel
   output.colors = output.colors || {}
 
+  const blueHighlight = `${variant.ansi.blue}14`
+  const blueHighlightStrong = `${variant.ansi.blue}1F`
+  const blueHighlightSoft = `${variant.ansi.blue}10`
+  const blueHighlightBorder = `${variant.ansi.blue}38`
+
   output.colors["editor.background"] = variant.background
   output.colors["editor.foreground"] = variant.foreground
   output.colors["editorCursor.foreground"] = variant.cursor
-  output.colors["editor.selectionBackground"] = `${variant.selectionBackground}CC`
+  output.colors["selection.background"] = blueHighlight
+  output.colors["editor.selectionBackground"] = blueHighlightStrong
+  output.colors["editor.inactiveSelectionBackground"] = blueHighlight
+  output.colors["editor.selectionHighlightBackground"] = blueHighlight
+  output.colors["editor.selectionHighlightBorder"] = blueHighlightBorder
+  output.colors["editor.wordHighlightBackground"] = blueHighlight
+  output.colors["editor.wordHighlightStrongBackground"] = blueHighlightStrong
+  output.colors["editor.wordHighlightBorder"] = blueHighlightBorder
+  output.colors["editor.wordHighlightStrongBorder"] = blueHighlightBorder
+  output.colors["editor.findMatchBorder"] = blueHighlightBorder
+  output.colors["editor.findMatchHighlightBorder"] = blueHighlightBorder
+  output.colors["editor.rangeHighlightBorder"] = blueHighlightBorder
+  output.colors["editor.hoverHighlightBackground"] = blueHighlightSoft
+  output.colors["editor.findRangeHighlightBackground"] = blueHighlightSoft
+  output.colors["editor.lineHighlightBackground"] = blueHighlightSoft
   output.colors["terminal.background"] = variant.background
   output.colors["terminal.foreground"] = variant.foreground
   output.colors["terminal.ansiBlack"] = variant.ansi.black
