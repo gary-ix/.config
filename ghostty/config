@@ -2,14 +2,18 @@
 
 # Super = ctrl+alt+shift
 
+# Main config
 macos-titlebar-style = transparent
 macos-icon = chalkboard
-# theme = Brogrammer
-theme = Gruvbox Dark Hard
 window-save-state = always
-background-opacity = 0.8
-background-blur = 99
-adjust-cell-height = 5%
+window-padding-x = 8
+window-padding-y = 0
+# theme = Subliminal
+# theme = Ghostty Default Style Dark
+theme = Gruvbox Dark Hard
+background-opacity = 0.90
+background-blur = 0
+adjust-cell-height = 10%
 cursor-style = bar
 font-family = JetBrainsMono Nerd Font
 font-size = 15 
