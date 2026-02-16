@@ -47,7 +47,7 @@ function prompt_git_line() {
 }
 
 function prompt_input_line() {
-  print -nr -- "%F{\${muted_color}}%f%F{\${path_bg}}❯%f"
+  print -nr -- "%F{\${path_fg}}❯%f"
 }
 
 PROMPT='$(prompt_context_line)\n$(prompt_git_line)\n$(prompt_input_line) '
