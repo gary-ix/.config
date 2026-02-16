@@ -12,6 +12,8 @@ function updateVscodeTheme(theme: any, variant: Variant, modeLabel: string) {
   const blueHighlightStrong = `${terminalAnsi.blue}1F`
   const blueHighlightSoft = `${terminalAnsi.blue}10`
   const blueHighlightBorder = `${terminalAnsi.blue}38`
+  const transparent = `${variant.background}00`
+  const unfocusedTopBorder = `${variant.foregroundMuted}80`
 
   output.colors["editor.background"] = variant.background
   output.colors["editor.foreground"] = variant.foreground
@@ -54,6 +56,12 @@ function updateVscodeTheme(theme: any, variant: Variant, modeLabel: string) {
   output.colors["terminal.ansiBrightMagenta"] = terminalAnsi.brightMagenta
   output.colors["terminal.ansiBrightCyan"] = terminalAnsi.brightCyan
   output.colors["terminal.ansiBrightWhite"] = terminalAnsi.brightWhite
+  output.colors["editorGroupHeader.tabsBorder"] = transparent
+  output.colors["tab.border"] = transparent
+  output.colors["tab.activeBorder"] = transparent
+  output.colors["tab.activeBorderTop"] = variant.borderActive
+  output.colors["tab.unfocusedActiveBorder"] = transparent
+  output.colors["tab.unfocusedActiveBorderTop"] = unfocusedTopBorder
 
   return output
 }
