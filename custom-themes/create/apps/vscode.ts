@@ -63,6 +63,21 @@ function updateVscodeTheme(theme: any, variant: Variant, modeLabel: string) {
   output.colors["tab.unfocusedActiveBorder"] = transparent
   output.colors["tab.unfocusedActiveBorderTop"] = unfocusedTopBorder
 
+  const gitModified = variant.syntax.variable
+  output.colors["gitDecoration.addedResourceForeground"] = variant.syntax.string
+  output.colors["gitDecoration.modifiedResourceForeground"] = gitModified
+  output.colors["gitDecoration.deletedResourceForeground"] = variant.syntax.keyword
+  output.colors["gitDecoration.renamedResourceForeground"] = variant.syntax.method
+  output.colors["gitDecoration.untrackedResourceForeground"] = variant.syntax.string
+  output.colors["gitDecoration.ignoredResourceForeground"] = variant.syntax.comment
+  output.colors["gitDecoration.conflictingResourceForeground"] = variant.warning
+  output.colors["gitDecoration.submoduleResourceForeground"] = variant.syntax.type
+  output.colors["gitDecoration.stageAddedResourceForeground"] = gitModified
+  output.colors["gitDecoration.stageModifiedResourceForeground"] = gitModified
+  output.colors["gitDecoration.stageDeletedResourceForeground"] = gitModified
+  output.colors["gitDecoration.stageRenamedResourceForeground"] = gitModified
+  output.colors["gitDecoration.stageUntrackedResourceForeground"] = variant.syntax.string
+
   return output
 }
 

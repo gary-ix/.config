@@ -1121,9 +1121,16 @@
     "titleBar.activeForeground": "#d9daec",
     "titleBar.inactiveBackground": "#101316",
     "titleBar.border": "#26283866",
-    "gitDecoration.ignoredResourceForeground": "#d9daec66",
-    "gitDecoration.conflictingResourceForeground": "#8f3f71",
-    "gitDecoration.submoduleResourceForeground": "#427b58",
+    "gitDecoration.addedResourceForeground": "#B8BB26",
+    "gitDecoration.modifiedResourceForeground": "#83A598",
+    "gitDecoration.deletedResourceForeground": "#FB4934",
+    "gitDecoration.renamedResourceForeground": "#689D6A",
+    "gitDecoration.untrackedResourceForeground": "#B8BB26",
+    "gitDecoration.ignoredResourceForeground": "#7F858B",
+    "gitDecoration.conflictingResourceForeground": "#D79921",
+    "gitDecoration.submoduleResourceForeground": "#FABD2F",
+    "gitDecoration.stageModifiedResourceForeground": "#83A598",
+    "gitDecoration.stageDeletedResourceForeground": "#83A598",
     "descriptionForeground": "#656675",
     "disabledForeground": "#656675",
     "list.deemphasizedForeground": "#656675",
@@ -1175,6 +1182,9 @@
     "editor.findMatchBorder": "#83A59838",
     "editor.findMatchHighlightBorder": "#83A59838",
     "editor.rangeHighlightBorder": "#83A59838",
-    "editorHint.foreground": "#B8BB26"
+    "editorHint.foreground": "#B8BB26",
+    "gitDecoration.stageAddedResourceForeground": "#83A598",
+    "gitDecoration.stageRenamedResourceForeground": "#83A598",
+    "gitDecoration.stageUntrackedResourceForeground": "#B8BB26"
   }
 }
