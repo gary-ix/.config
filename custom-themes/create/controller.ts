@@ -5,8 +5,8 @@ import { ohMyZshApp } from "./apps/oh-my-zsh"
 import { opencodeApp } from "./apps/opencode"
 import { vscodeApp } from "./apps/vscode"
 import { PATHS } from "./paths"
-import type { CreateInstallModule, ThemeTokens } from "./types"
-import { readJsonc } from "./utils"
+import type { CreateInstallModule } from "./types"
+import { parseCssTokens } from "./utils"
 
 const APPS: CreateInstallModule[] = [vscodeApp, opencodeApp, ghosttyApp, nvimApp, ohMyZshApp]
 
@@ -32,7 +32,7 @@ async function runCommand(command: string, args: string[]) {
 async function run() {
   await runCommand("npm", ["--prefix", "custom-themes/vsce-package", "install"])
 
-  const tokens = await readJsonc<ThemeTokens>(PATHS.tokens)
+  const tokens = await parseCssTokens(PATHS.tokens)
 
   const created: Array<{ app: string; files: string[] }> = []
   for (const app of APPS) {
