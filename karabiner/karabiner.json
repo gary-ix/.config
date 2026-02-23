@@ -41,6 +41,37 @@
                         ]
                     },
                     {
+                        "description": "Map SUPER+R to Ctrl+Tab and SUPER+E to Ctrl+Shift+Tab",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "r",
+                                    "modifiers": { "mandatory": ["left_control", "left_option", "left_shift"] }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "tab",
+                                        "modifiers": ["control"]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "e",
+                                    "modifiers": { "mandatory": ["left_control", "left_option", "left_shift"] }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "tab",
+                                        "modifiers": ["control", "shift"]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "Map Alt+C to Ctrl+C",
                         "manipulators": [
                             {
@@ -400,16 +431,16 @@
                     "to": [{ "key_code": "vk_none" }]
                 },
                 {
+                    "from": { "key_code": "left_option" },
+                    "to": [{ "key_code": "left_control" }]
+                },
+                {
                     "from": { "key_code": "right_arrow" },
                     "to": [{ "key_code": "vk_none" }]
                 },
                 {
                     "from": { "key_code": "up_arrow" },
                     "to": [{ "key_code": "vk_none" }]
-                },
-                {
-                    "from": { "key_code": "left_option" },
-                    "to": [{ "key_code": "left_control" }]
                 }
             ],
             "virtual_hid_keyboard": {

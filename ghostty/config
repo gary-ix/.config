@@ -8,7 +8,6 @@ macos-icon = chalkboard
 window-save-state = always
 window-padding-x = 8
 window-padding-y = 0
-# theme = gtheme-dark
 theme = gtheme-dark
 background-opacity = 0.95
 background-blur = 0
@@ -56,12 +55,11 @@ keybind = cmd+shift+j=new_split:down
 keybind = cmd+shift+k=new_split:up
 keybind = cmd+shift+l=new_split:right
 
-# quick terminal
-#keybind = global:ctrl+shift+alt+t=toggle_quick_terminal
-quick-terminal-animation-duration = 0.01
+# quick terminal (action=toggle_quick_terminal)
+quick-terminal-animation-duration = 0
 quick-terminal-position = center
-quick-terminal-size = 60%,60%
 quick-terminal-screen = macos-menu-bar
+quick-terminal-screen = main
 quick-terminal-autohide = false
 
 # lazygit launcher
