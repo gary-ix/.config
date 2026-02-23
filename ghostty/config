@@ -9,6 +9,7 @@ window-save-state = always
 window-padding-x = 8
 window-padding-y = 0
 theme = dark:gtheme-dark,light:gtheme-light
+minimum-contrast = 4
 background-opacity = 0.95
 background-blur = 0
 adjust-cell-height = 10%

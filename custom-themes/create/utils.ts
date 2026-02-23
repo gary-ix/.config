@@ -103,15 +103,15 @@ export function deriveTerminalAnsi(variant: Variant): TerminalAnsi {
     yellow: variant.syntax.type,
     blue: variant.syntax.variable,
     magenta: variant.syntax.number,
-    cyan: variant.syntax.method,
+    cyan: variant.info,
     white: variant.syntax.punctuation,
     brightBlack: variant.syntax.comment,
     brightRed: variant.syntax.keyword,
-    brightGreen: variant.syntax.function,
+    brightGreen: variant.syntax.string,
     brightYellow: variant.syntax.type,
     brightBlue: variant.syntax.variable,
     brightMagenta: variant.syntax.number,
-    brightCyan: variant.syntax.function,
+    brightCyan: variant.info,
     brightWhite: variant.foreground,
   }
 }
