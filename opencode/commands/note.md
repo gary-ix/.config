@@ -1,5 +1,6 @@
 ---
 description: Create or update a discussion note in .local/discussions/
+agent: pair-programmer
 ---
 
 Topic: $ARGUMENTS
