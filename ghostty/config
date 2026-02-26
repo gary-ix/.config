@@ -35,8 +35,8 @@ keybind = ctrl+tab=unbind
 keybind = ctrl+shift+tab=unbind
 keybind = super+shift+bracket_left=unbind
 keybind = super+shift+bracket_right=unbind
-keybind = ctrl+alt+shift+r=next_tab
-keybind = ctrl+alt+shift+e=previous_tab
+keybind = ctrl+alt+shift+s=next_tab
+keybind = ctrl+alt+shift+a=previous_tab
 
 # Pane navigation
 keybind = super+alt+arrow_left=unbind
