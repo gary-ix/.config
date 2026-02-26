@@ -4,6 +4,7 @@
 ;; Effective behavior in this file:
 ;; - caps: tap -> esc, hold -> SUPER mods (ctrl+alt+shift)
 ;; - left alt: tap -> left alt, hold -> SUPER mods (ctrl+alt+shift)
+;; - on Windows only: ctrl/alt are swapped to feel more Mac-like
 ;; - while SUPER is held:
 ;;   - h/j/k/l -> left/down/up/right
 ;; - physical arrow keys are disabled
@@ -42,6 +43,14 @@
   caps-super  (tap-hold-release $tap-ms $hold-ms esc @super-hold)
   ;; left alt: tap left alt, hold SUPER.
   lalt-super  (tap-hold-release $tap-ms $hold-ms lalt @super-hold)
+  ;; Windows variant: tap left ctrl, hold SUPER.
+  lalt-super-win (tap-hold-release $tap-ms $hold-ms lctl @super-hold)
+
+  ;; Base layer defaults (macOS/non-Windows behavior).
+  main-lalt @lalt-super
+  main-lctl _
+  main-ralt _
+  main-rctl _
 
   ;; SUPER layer outputs.
   sup-left    (unmod left)
@@ -50,11 +59,27 @@
   sup-right   (unmod rght)
 )
 
+;; Windows-only modifier behavior.
+;; Swap ctrl/alt so the key near space acts like the primary shortcut key.
+(platform (win winiov2 wintercept)
+  (defalias
+    main-lalt @lalt-super-win
+    main-lctl lalt
+    main-ralt rctl
+    main-rctl ralt
+  )
+)
+
 ;; Base layer: only remapped keys are listed here.
 (deflayermap (base)
   ;; Dual-role keys for SUPER behavior.
   caps @caps-super
-  lalt @lalt-super
+  lalt @main-lalt
+
+  ;; Platform-specific ctrl/alt mapping.
+  lctl @main-lctl
+  ralt @main-ralt
+  rctl @main-rctl
 
   ;; Keep physical arrows disabled (matches original Karabiner profile).
   left XX
