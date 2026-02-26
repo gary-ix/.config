@@ -1,5 +1,6 @@
 {
     "global": {
+        "check_for_updates_on_startup": false,
         "enable_notification_window": false,
         "show_in_menu_bar": false
     },
@@ -9,6 +10,7 @@
                 "rules": [
                     {
                         "description": "SUPER KEY: Caps->Esc on tap; hold gives Ctrl+Opt+Shift. Option behaves similarly. No caps_lock, no lazy.",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": {
@@ -42,6 +44,7 @@
                     },
                     {
                         "description": "Map SUPER+R to Ctrl+Tab and SUPER+E to Ctrl+Shift+Tab",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": {
@@ -73,6 +76,7 @@
                     },
                     {
                         "description": "Map Alt+C to Ctrl+C",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": {
@@ -204,6 +208,7 @@
                     },
                     {
                         "description": "ARROW-KEYS to SUPER + HJKL",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": {
