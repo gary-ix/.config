@@ -5,14 +5,8 @@
 ; Mac-like modifier positions on a typical Windows keyboard:
 ; - Left Alt behaves like Left Control
 ; - Left Win/Copilot behaves like Left Alt
-; - Left Fn (assumed SC163) behaves like Left Win/Copilot
-; - Left Control behaves like Left Fn (assumed SC163)
 LAlt::LControl
 LWin::LAlt
-*SC163::Send("{Blind}{LWin DownR}")
-*SC163 Up::Send("{Blind}{LWin Up}")
-*LControl::Send("{Blind}{SC163 DownR}")
-*LControl Up::Send("{Blind}{SC163 Up}")
 
 ; BEGIN AUTO-GENERATED FROM KARABINER
 ; DO NOT EDIT INSIDE THIS BLOCK
