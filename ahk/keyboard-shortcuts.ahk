@@ -9,8 +9,10 @@
 ; - Left Control behaves like Left Fn (assumed SC163)
 LAlt::LControl
 LWin::LAlt
-SC163::LWin
-LControl::SC163
+*SC163::Send("{Blind}{LWin DownR}")
+*SC163 Up::Send("{Blind}{LWin Up}")
+*LControl::Send("{Blind}{SC163 DownR}")
+*LControl Up::Send("{Blind}{SC163 Up}")
 
 ; BEGIN AUTO-GENERATED FROM KARABINER
 ; DO NOT EDIT INSIDE THIS BLOCK
