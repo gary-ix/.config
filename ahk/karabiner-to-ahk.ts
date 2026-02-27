@@ -34,6 +34,7 @@ type Manipulator = {
 		key_code?: string;
 		modifiers?: {
 			mandatory?: string[];
+			optional?: string[];
 		};
 	};
 	to?: Array<{
@@ -81,6 +82,16 @@ const AHK_KEY_NAMES: Record<string, string> = {
 	spacebar: "Space",
 	tab: "Tab",
 	escape: "Escape",
+	left_control: "LControl",
+	right_control: "RControl",
+	left_option: "LAlt",
+	right_option: "RAlt",
+	left_alt: "LAlt",
+	right_alt: "RAlt",
+	left_shift: "LShift",
+	right_shift: "RShift",
+	left_command: "LWin",
+	right_command: "RWin",
 	return_or_enter: "Enter",
 	delete_or_backspace: "Backspace",
 	delete_forward: "Delete",
@@ -145,7 +156,24 @@ function quoteAhkKeyForSend(key: string): string {
 	return `{${key}}`;
 }
 
-function toAhkLine(manipulator: Manipulator): string | null {
+function buildPressReleaseTokens(
+	toEvent: NonNullable<Manipulator["to"]>[number],
+) {
+	const keys = [...(toEvent.modifiers ?? []), toEvent.key_code].filter(
+		(key): key is string => Boolean(key),
+	);
+
+	const normalizedKeys = [...new Set(keys.map((key) => normalizeAhkKey(key)))];
+	const press = normalizedKeys.map((key) => `{${key} DownR}`).join("");
+	const release = [...normalizedKeys]
+		.reverse()
+		.map((key) => `{${key} Up}`)
+		.join("");
+
+	return { press, release };
+}
+
+function toAhkEntry(manipulator: Manipulator): string | null {
 	// This converter intentionally focuses on straightforward remaps.
 	if (manipulator.type !== "basic") {
 		return null;
@@ -156,11 +184,8 @@ function toAhkLine(manipulator: Manipulator): string | null {
 		return null;
 	}
 
-	// Skip delayed/tap-hold behaviors.
-	if (
-		manipulator.to_delayed_action ||
-		(manipulator.to_if_alone?.length ?? 0) > 0
-	) {
+	// Skip delayed behaviors.
+	if (manipulator.to_delayed_action) {
 		return null;
 	}
 
@@ -173,6 +198,35 @@ function toAhkLine(manipulator: Manipulator): string | null {
 	// Only the first target key event is used for deterministic one-line output.
 	if (!firstTo?.key_code || firstTo.set_variable) {
 		return null;
+	}
+
+	const tapTo = manipulator.to_if_alone?.[0] as
+		| { key_code?: string }
+		| undefined;
+
+	// Support common dual-role mappings (hold => to, tap => to_if_alone).
+	if (tapTo?.key_code) {
+		const mandatory = manipulator.from?.modifiers?.mandatory ?? [];
+		if (mandatory.length > 0) {
+			return null;
+		}
+
+		const fromKey = normalizeAhkKey(fromKeyCode);
+		const tapKey = normalizeAhkKey(tapTo.key_code);
+		const tapSend = quoteAhkKeyForSend(tapKey);
+		const { press, release } = buildPressReleaseTokens(firstTo);
+
+		return [
+			`*${fromKey}::`,
+			"{",
+			`\tSend("{Blind}${press}")`,
+			`\tKeyWait("${fromKey}")`,
+			`\tSend("{Blind}${release}")`,
+			`\tif (A_PriorKey = "${fromKey}") {`,
+			`\t\tSend("${tapSend}")`,
+			"\t}",
+			"}",
+		].join("\n");
 	}
 
 	const fromModifiers = toModifierSymbols(
@@ -212,12 +266,6 @@ function upsertManagedBlock(
 		"; This file is partially generated from karabiner/karabiner.json.",
 		"; Add custom hotkeys outside the managed block below.",
 		"",
-		"; Mac-like modifier positions on a typical Windows keyboard:",
-		"; - Left Alt behaves like Left Control",
-		"; - Left Win/Copilot behaves like Left Alt",
-		"LAlt::LControl",
-		"LWin::LAlt",
-		"",
 		generatedBlock,
 		"",
 	].join("\n");
@@ -252,7 +300,7 @@ async function main() {
 	}
 
 	const rules = profile.complex_modifications?.rules ?? [];
-	const generatedLines: string[] = [];
+	const generatedEntries: string[] = [];
 	let skippedCount = 0;
 
 	// 2) Convert manipulators from enabled rules into AHK hotkey lines.
@@ -262,19 +310,17 @@ async function main() {
 		}
 
 		for (const manipulator of rule.manipulators ?? []) {
-			const line = toAhkLine(manipulator);
-			if (line) {
-				generatedLines.push(line);
+			const entry = toAhkEntry(manipulator);
+			if (entry) {
+				generatedEntries.push(entry);
 			} else {
 				skippedCount += 1;
 			}
 		}
 	}
 
-	// 3) De-duplicate + sort so generated output is stable across runs.
-	const uniqueSortedLines = [...new Set(generatedLines)].sort((a, b) =>
-		a.localeCompare(b),
-	);
+	// 3) De-duplicate entries while preserving order.
+	const uniqueSortedLines = [...new Set(generatedEntries)];
 
 	const generatedBlock = buildGeneratedBlock(uniqueSortedLines);
 
