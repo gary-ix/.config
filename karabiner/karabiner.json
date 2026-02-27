@@ -10,7 +10,6 @@
                 "rules": [
                     {
                         "description": "SUPER KEY: Caps->Esc on tap; hold gives Ctrl+Opt+Shift. Option behaves similarly. No caps_lock, no lazy.",
-                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": {
@@ -38,57 +37,6 @@
                                     }
                                 ],
                                 "to_if_alone": [{ "key_code": "left_option" }],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "Map SUPER+R to Ctrl+Tab and SUPER+E to Ctrl+Shift+Tab",
-                        "enabled": false,
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "r",
-                                    "modifiers": { "mandatory": ["left_control", "left_option", "left_shift"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "tab",
-                                        "modifiers": ["control"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "from": {
-                                    "key_code": "e",
-                                    "modifiers": { "mandatory": ["left_control", "left_option", "left_shift"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "tab",
-                                        "modifiers": ["control", "shift"]
-                                    }
-                                ],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "Map Alt+C to Ctrl+C",
-                        "enabled": false,
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "c",
-                                    "modifiers": { "mandatory": ["right_option"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "c",
-                                        "modifiers": ["left_control"]
-                                    }
-                                ],
                                 "type": "basic"
                             }
                         ]
@@ -208,7 +156,6 @@
                     },
                     {
                         "description": "ARROW-KEYS to SUPER + HJKL",
-                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": {
@@ -272,45 +219,6 @@
                                         "modifiers": []
                                     }
                                 ],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "Mac OSX: disable cmd + option + h + m to prevent minimising all windows",
-                        "enabled": false,
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "h",
-                                    "modifiers": {
-                                        "mandatory": ["command", "option"],
-                                        "optional": ["any"]
-                                    }
-                                },
-                                "type": "basic"
-                            },
-                            {
-                                "from": {
-                                    "key_code": "m",
-                                    "modifiers": {
-                                        "mandatory": ["command", "option"],
-                                        "optional": ["any"]
-                                    }
-                                },
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "Mac OSX: disable cmd + h to prevent minimising an application window",
-                        "enabled": false,
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "h",
-                                    "modifiers": { "mandatory": ["command"] }
-                                },
                                 "type": "basic"
                             }
                         ]
