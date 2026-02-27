@@ -32,7 +32,7 @@ install_launchd() {
   local tmp_plist
   kanata_bin="$(command -v kanata)"
   tmp_plist="$(mktemp)"
-  trap 'rm -f "$tmp_plist"' EXIT
+  trap 'rm -f -- "${tmp_plist:-}"' EXIT
 
   cat >"$tmp_plist" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
