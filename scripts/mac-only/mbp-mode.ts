@@ -532,7 +532,7 @@ function main() {
 		return;
 	}
 
-	console.error("Usage: tsx scripts/mbp-mode.ts <current|normal|server>");
+	console.error("Usage: tsx scripts/mac-only/mbp-mode.ts <current|normal|server>");
 	process.exit(1);
 }
 
