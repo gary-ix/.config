@@ -3,25 +3,11 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+LIB_DIR="$SCRIPT_DIR/lib"
 
-log_section() {
-  printf '\n==> %s\n' "$1"
-}
-
-log_info() {
-  printf ' - %s\n' "$1"
-}
-
-log_error() {
-  printf 'ERROR: %s\n' "$1" >&2
-}
-
-run_step() {
-  local label="$1"
-  shift
-  log_section "$label"
-  "$@"
-}
+. "$LIB_DIR/logging.sh"
+. "$LIB_DIR/node-dev-setup.sh"
+. "$LIB_DIR/zsh-setup.sh"
 
 ensure_macos() {
   if [[ "${OSTYPE:-}" != darwin* ]]; then
@@ -86,70 +72,13 @@ ensure_github_cli() {
   log_info 'GitHub CLI installed.'
 }
 
-load_nvm() {
-  export NVM_DIR="$HOME/.nvm"
-
-  if [[ -s "$NVM_DIR/nvm.sh" ]]; then
-    # shellcheck disable=SC1090
-    . "$NVM_DIR/nvm.sh"
-  fi
-}
-
-ensure_nvm() {
-  load_nvm
-  if command -v nvm >/dev/null 2>&1; then
-    log_info 'nvm already installed.'
-    return
-  fi
-
-  log_info 'Installing nvm...'
-  curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-  load_nvm
-
-  if ! command -v nvm >/dev/null 2>&1; then
-    log_error 'nvm install completed, but nvm is not available in this shell.'
-    log_error 'Open a new terminal and run: nvm install --lts'
-    exit 1
-  fi
-
-  log_info 'nvm installed.'
-}
-
-ensure_node_and_npm() {
-  ensure_nvm
-
-  if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
-    log_info 'Node.js and npm already installed.'
-    return
-  fi
-
-  log_info 'Installing Node.js LTS with nvm...'
-  nvm install --lts
-  nvm alias default 'lts/*'
-  nvm use --lts
-  log_info 'Node.js and npm installed.'
-}
-
-link_repo_zshrc() {
-  local source="$ROOT_DIR/.zshrc"
-  local target="$HOME/.zshrc"
-
-  if [[ ! -f "$source" ]]; then
-    log_error "Missing repo zshrc: $source"
-    exit 1
-  fi
-
-  ln -sfn "$source" "$target"
-  log_info "Linked $target -> $source"
-}
-
 main() {
   run_step 'Validating platform' ensure_macos
   run_step 'Validating user' ensure_not_root
   run_step 'Ensuring Homebrew' ensure_homebrew
   run_step 'Ensuring GitHub CLI' ensure_github_cli
-  run_step 'Ensuring Node.js and npm' ensure_node_and_npm
-  run_step 'Linking shell config' link_repo_zshrc
+  run_step 'Node Dev Setup' node_dev_setup
+  run_step 'ZSH Setup' zsh_setup
   log_section 'Done'
   log_info 'mac install complete'
 }
