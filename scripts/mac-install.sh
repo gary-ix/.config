@@ -83,6 +83,17 @@ set_mac_system_settings() {
   bash "$script_path"
 }
 
+install_mac_software() {
+  local script_path="$SCRIPT_DIR/mac-only/mac-install-software.sh"
+
+  if [[ ! -f "$script_path" ]]; then
+    log_error "Missing mac software install script: $script_path"
+    exit 1
+  fi
+
+  bash "$script_path"
+}
+
 main() {
   run_step 'Validating platform' ensure_macos
   run_step 'Validating user' ensure_not_root
@@ -90,6 +101,7 @@ main() {
   run_step 'Install GitHub CLI' install_github_cli
   run_step 'Node Dev Setup' node_dev_setup
   run_step 'ZSH Setup' zsh_setup
+  run_step 'Install Mac Software' install_mac_software
   run_step 'Set Mac System Settings' set_mac_system_settings
   log_section 'Done'
   log_info 'mac install complete'
