@@ -72,19 +72,15 @@ install_github_cli() {
   log_info 'GitHub CLI installed.'
 }
 
-setup_file_associations() {
-  local script_path="$SCRIPT_DIR/mac-only/setup-file-associations.sh"
+set_mac_system_settings() {
+  local script_path="$SCRIPT_DIR/mac-only/mac-system-settings.sh"
 
   if [[ ! -f "$script_path" ]]; then
-    log_error "Missing file associations script: $script_path"
+    log_error "Missing mac system settings script: $script_path"
     exit 1
   fi
 
   bash "$script_path"
-}
-
-set_mac_system_settings() {
-  run_step 'Install File Associations' setup_file_associations
 }
 
 main() {
