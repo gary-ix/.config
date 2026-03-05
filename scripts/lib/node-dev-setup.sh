@@ -9,7 +9,7 @@ load_nvm() {
   fi
 }
 
-ensure_nvm() {
+install_nvm() {
   load_nvm
   if command -v nvm >/dev/null 2>&1; then
     log_info 'nvm already installed.'
@@ -30,7 +30,7 @@ ensure_nvm() {
 }
 
 node_dev_setup() {
-  ensure_nvm
+  install_nvm
 
   if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
     log_info 'Node.js and npm already installed.'

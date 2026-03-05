@@ -39,7 +39,7 @@ load_homebrew() {
   fi
 }
 
-ensure_homebrew() {
+install_homebrew() {
   load_homebrew
   if command -v brew >/dev/null 2>&1; then
     log_info 'Homebrew already installed.'
@@ -61,7 +61,7 @@ ensure_homebrew() {
   log_info 'Homebrew installed.'
 }
 
-ensure_github_cli() {
+install_github_cli() {
   if command -v gh >/dev/null 2>&1; then
     log_info 'GitHub CLI already installed.'
     return
@@ -72,13 +72,29 @@ ensure_github_cli() {
   log_info 'GitHub CLI installed.'
 }
 
+setup_file_associations() {
+  local script_path="$SCRIPT_DIR/mac-only/setup-file-associations.sh"
+
+  if [[ ! -f "$script_path" ]]; then
+    log_error "Missing file associations script: $script_path"
+    exit 1
+  fi
+
+  bash "$script_path"
+}
+
+set_mac_system_settings() {
+  run_step 'Install File Associations' setup_file_associations
+}
+
 main() {
   run_step 'Validating platform' ensure_macos
   run_step 'Validating user' ensure_not_root
-  run_step 'Ensuring Homebrew' ensure_homebrew
-  run_step 'Ensuring GitHub CLI' ensure_github_cli
+  run_step 'Install Homebrew' install_homebrew
+  run_step 'Install GitHub CLI' install_github_cli
   run_step 'Node Dev Setup' node_dev_setup
   run_step 'ZSH Setup' zsh_setup
+  run_step 'Set Mac System Settings' set_mac_system_settings
   log_section 'Done'
   log_info 'mac install complete'
 }
