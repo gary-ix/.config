@@ -20,13 +20,9 @@
 !karabiner/
 !karabiner/karabiner.json
 
-!ahk/
-!ahk/**
-
 !kanata/
 !kanata/kanata.kbd
 !kanata/kanata.sh
-!kanata/kanata.ps1
 
 !ghostty/
 !ghostty/config
@@ -64,8 +60,6 @@
 !scripts/mbp-mode.ts
 !scripts/mac-install.sh
 !scripts/mac-uninstall.sh
-!scripts/win-install.ps1
-!scripts/win-uninstall.ps1
 !scripts/raycast-scripts/
 !scripts/raycast-scripts/toggle-ghostty-quick-terminal.sh
 
