@@ -66,8 +66,9 @@
 !scripts/mac-uninstall.sh
 !scripts/win-install.ps1
 !scripts/win-uninstall.ps1
-!scripts/raycast-scripts/
-!scripts/raycast-scripts/toggle-ghostty-quick-terminal.sh
+!scripts/mac-only/
+!scripts/mac-only/toggle-ghostty-quick-terminal.sh
+!scripts/mac-only/zoom-all-windows.sh
 
 !custom-themes/
 !custom-themes/create/
