@@ -56,7 +56,12 @@ const MBP_SETTINGS = {
 		description:
 			"CPU power profile (0 lower power, 1 balanced, 2 higher performance).",
 		normal: 2,
-		server: 1,
+		server: 2,
+	},
+	lowpowermode: {
+		description: "Low power mode (0 off, 1 on).",
+		normal: 0,
+		server: 0,
 	},
 	restartPowerFailure: {
 		description: "Auto restart after power failure (on/off).",
@@ -173,6 +178,59 @@ function getCurrentPmsetValues(): {
 	return { activePowerSource, sections };
 }
 
+function parsePmsetCapabilities(output: string): Record<string, Set<string>> {
+	const capabilitiesBySource: Record<string, Set<string>> = {};
+	let currentSource: string | null = null;
+
+	for (const line of output.split("\n")) {
+		const headerMatch = line.match(/^Capabilities for (.+):$/);
+		if (headerMatch) {
+			currentSource = headerMatch[1];
+			capabilitiesBySource[currentSource] = new Set<string>();
+			continue;
+		}
+
+		if (!currentSource) {
+			continue;
+		}
+
+		const capability = line.trim();
+		if (!capability) {
+			continue;
+		}
+
+		capabilitiesBySource[currentSource].add(capability);
+	}
+
+	return capabilitiesBySource;
+}
+
+function getPmsetCapabilitiesForSource(powerSource: string): Set<string> {
+	const result = runCommand("pmset", ["-g", "cap"]);
+	if (!result.success) {
+		throw new Error(result.stderr || "Unable to read pmset capabilities.");
+	}
+
+	const capabilitiesBySource = parsePmsetCapabilities(result.stdout);
+	return capabilitiesBySource[powerSource] ?? new Set<string>();
+}
+
+function getPowerSourceFlag(powerSource: string): "-c" | "-b" | "-u" {
+	if (powerSource === "AC Power") {
+		return "-c";
+	}
+
+	if (powerSource === "Battery Power") {
+		return "-b";
+	}
+
+	if (powerSource === "UPS Power") {
+		return "-u";
+	}
+
+	throw new Error(`Unsupported power source '${powerSource}'.`);
+}
+
 function parseRestartSetting(output: string): "on" | "off" | null {
 	const match = output.match(/:\s*(on|off)\s*$/i);
 	if (!match) {
@@ -208,16 +266,23 @@ function formatValue(value: string): string {
 function requireSudoForModeChange() {
 	if (typeof process.getuid === "function" && process.getuid() !== 0) {
 		throw new Error(
-			"Mode changes require sudo. Run with: sudo npm run mbp:<mode>",
+			"Mode changes require sudo. Run with: sudo npm run mac:power:<mode>",
 		);
 	}
 }
 
 function applyPmsetMode(mode: ModeKey) {
-	const args: string[] = ["-a"];
+	const activePowerSource = getActivePowerSource();
+	const powerSourceFlag = getPowerSourceFlag(activePowerSource);
+	const capabilities = getPmsetCapabilitiesForSource(activePowerSource);
+	const args: string[] = [powerSourceFlag];
 
 	for (const key of Object.keys(MBP_SETTINGS) as SettingKey[]) {
 		if (key in RESTART_SETTINGS) {
+			continue;
+		}
+
+		if (!capabilities.has(key)) {
 			continue;
 		}
 
@@ -297,93 +362,145 @@ function parseOnOffValue(output: string): "on" | "off" | null {
 	return match[1].toLowerCase() as "on" | "off";
 }
 
-function checkExternalDisplayConnected(): PostCheck {
-	const result = runCommand("system_profiler", ["SPDisplaysDataType", "-json"]);
+function isMissingCommandError(error: unknown): boolean {
+	if (typeof error !== "object" || error === null) {
+		return false;
+	}
+
+	if (!("code" in error)) {
+		return false;
+	}
+
+	return (error as { code?: string }).code === "ENOENT";
+}
+
+function checkScreenSharingEnabled(): PostCheck {
+	const result = runCommand("launchctl", [
+		"print",
+		"system/com.apple.screensharing",
+	]);
 	if (!result.success) {
 		return {
-			name: "External display",
+			name: "Screen Sharing (VNC)",
 			ok: false,
-			details: "Unable to inspect connected displays.",
-		};
-	}
-
-	try {
-		const parsed = JSON.parse(result.stdout) as {
-			SPDisplaysDataType?: Array<Record<string, unknown>>;
-		};
-		const gpuEntries = parsed.SPDisplaysDataType ?? [];
-		let totalDisplays = 0;
-		let builtInDisplays = 0;
-
-		for (const gpuEntry of gpuEntries) {
-			const displays = Array.isArray(gpuEntry.spdisplays_ndrvs)
-				? gpuEntry.spdisplays_ndrvs
-				: [];
-
-			totalDisplays += displays.length;
-
-			for (const display of displays) {
-				if (
-					typeof display === "object" &&
-					display !== null &&
-					"_name" in display &&
-					typeof display._name === "string" &&
-					display._name.toLowerCase().includes("color lcd")
-				) {
-					builtInDisplays += 1;
-				}
-			}
-		}
-
-		const externalDisplays = Math.max(0, totalDisplays - builtInDisplays);
-
-		return {
-			name: "External display",
-			ok: externalDisplays > 0,
 			details:
-				externalDisplays > 0
-					? `${externalDisplays} external display(s) detected.`
-					: "No external display detected. Clamshell lid-close may sleep the Mac.",
+				"Screen Sharing is off. Enable it in System Settings > General > Sharing.",
 			critical: true,
 		};
-	} catch {
-		return {
-			name: "External display",
-			ok: false,
-			details: "Unable to parse display information.",
-		};
 	}
+
+	return {
+		name: "Screen Sharing (VNC)",
+		ok: true,
+		details: "Screen Sharing service is enabled.",
+		critical: true,
+	};
+}
+
+function checkTailscaleConnected(): PostCheck {
+	const tailscaleCommands = [
+		"tailscale",
+		"/Applications/Tailscale.app/Contents/MacOS/Tailscale",
+	];
+
+	for (const command of tailscaleCommands) {
+		const result = runCommand(command, ["status", "--json"]);
+
+		if (isMissingCommandError(result.error)) {
+			continue;
+		}
+
+		if (!result.success) {
+			return {
+				name: "Tailscale",
+				ok: false,
+				details: (
+					result.stderr ||
+					result.stdout ||
+					"Unable to read Tailscale status."
+				).trim(),
+				critical: true,
+			};
+		}
+
+		try {
+			const status = JSON.parse(result.stdout) as {
+				BackendState?: string;
+				Self?: {
+					Online?: boolean;
+					DNSName?: string;
+					TailscaleIPs?: string[];
+				};
+			};
+
+			const online = status.BackendState === "Running" && status.Self?.Online;
+			if (online) {
+				const dnsName = status.Self?.DNSName || "unknown host";
+				const ip = status.Self?.TailscaleIPs?.[0] || "no Tailscale IP";
+				return {
+					name: "Tailscale",
+					ok: true,
+					details: `Connected as ${dnsName} (${ip}).`,
+					critical: true,
+				};
+			}
+
+			return {
+				name: "Tailscale",
+				ok: false,
+				details: `Tailscale is not connected (state: ${status.BackendState ?? "unknown"}).`,
+				critical: true,
+			};
+		} catch {
+			return {
+				name: "Tailscale",
+				ok: false,
+				details: "Unable to parse Tailscale status output.",
+				critical: true,
+			};
+		}
+	}
+
+	return {
+		name: "Tailscale",
+		ok: false,
+		details: "Tailscale CLI not found. Install the Tailscale app and sign in.",
+		critical: true,
+	};
 }
 
 function checkServerPmsetTargets(): PostCheck {
-	const { sections } = getCurrentPmsetValues();
+	const { activePowerSource, sections } = getCurrentPmsetValues();
+	const capabilities = getPmsetCapabilitiesForSource(activePowerSource);
 	const keysToCheck: Array<keyof typeof MBP_SETTINGS> = [
 		"sleep",
 		"womp",
 		"standby",
 		"tcpkeepalive",
 		"ttyskeepawake",
+		"powermode",
+		"lowpowermode",
 	];
+	const supportedKeys = keysToCheck.filter((key) => capabilities.has(key));
 
 	const mismatches: string[] = [];
+	const activeSection = sections[activePowerSource] ?? {};
 
-	for (const sectionName of Object.keys(sections)) {
-		for (const key of keysToCheck) {
-			const expected = String(MBP_SETTINGS[key].server);
-			const actual = sections[sectionName][key];
+	for (const key of supportedKeys) {
+		const expected = String(MBP_SETTINGS[key].server);
+		const actual = activeSection[key];
 
-			if (actual === undefined) {
-				mismatches.push(
-					`${sectionName}:${key}=unavailable (expected ${expected})`,
-				);
-				continue;
-			}
+		if (actual === undefined) {
+			mismatches.push(
+				`${activePowerSource}:${key}=unavailable (expected ${expected})`,
+			);
+			continue;
+		}
 
-			if (formatValue(actual) !== expected) {
-				mismatches.push(
-					`${sectionName}:${key}=${formatValue(actual)} (expected ${expected})`,
-				);
-			}
+		if (formatValue(actual) !== expected) {
+			mismatches.push(
+				`${activePowerSource}:${key}=${formatValue(actual)} (expected ${expected})`,
+			);
 		}
 	}
 
@@ -392,7 +509,7 @@ function checkServerPmsetTargets(): PostCheck {
 		ok: mismatches.length === 0,
 		details:
 			mismatches.length === 0
-				? "sleep/womp/standby/tcpkeepalive/ttyskeepawake match server mode in all power sections."
+				? `${supportedKeys.join("/")} match server mode for ${activePowerSource}.`
 				: `Mismatches: ${mismatches.join("; ")}`,
 		critical: true,
 	};
@@ -420,19 +537,6 @@ function checkRemoteLoginEnabled(): PostCheck {
 	};
 }
 
-function checkParsecRunning(): PostCheck {
-	const result = runCommand("pgrep", ["-lf", "parsec"]);
-	const running = result.success && result.stdout.trim().length > 0;
-
-	return {
-		name: "Parsec process",
-		ok: running,
-		details: running
-			? "Parsec process appears to be running."
-			: "Parsec is not running. Start it before lid-close tests.",
-	};
-}
-
 function runServerPostChecks() {
 	const checks: PostCheck[] = [];
 
@@ -444,7 +548,7 @@ function runServerPostChecks() {
 			details:
 				activePowerSource === "AC Power"
 					? "Running on AC power."
-					: `Running on ${activePowerSource}. Use AC for clamshell reliability.`,
+					: `Running on ${activePowerSource}. Use AC for always-on reliability.`,
 			critical: true,
 		});
 	} catch (error) {
@@ -467,9 +571,9 @@ function runServerPostChecks() {
 		});
 	}
 
-	checks.push(checkExternalDisplayConnected());
+	checks.push(checkTailscaleConnected());
 	checks.push(checkRemoteLoginEnabled());
-	checks.push(checkParsecRunning());
+	checks.push(checkScreenSharingEnabled());
 
 	console.log("Server mode post-checks:");
 	for (const check of checks) {
@@ -482,7 +586,7 @@ function runServerPostChecks() {
 	);
 	if (criticalFailures.length > 0) {
 		console.warn(
-			"Server mode applied, but critical reachability checks failed. Lid-close may make the Mac unreachable.",
+			"Server mode applied, but critical reachability checks failed. Remote access through Tailscale/SSH/Screen Sharing may not work.",
 		);
 	}
 }
@@ -532,7 +636,9 @@ function main() {
 		return;
 	}
 
-	console.error("Usage: tsx scripts/mac-only/mbp-mode.ts <current|normal|server>");
+	console.error(
+		"Usage: tsx scripts/mac-only/mac-power-mode.ts <current|normal|server>",
+	);
 	process.exit(1);
 }
 

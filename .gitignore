@@ -56,8 +56,10 @@
 
 # Scripts
 !scripts/
+!scripts/mac-only/
+!scripts/mac-only/**
 !scripts/setup-file-associations.sh
-!scripts/mbp-mode.ts
+!scripts/mac-only/mac-power-mode.ts
 !scripts/mac-install.sh
 !scripts/mac-uninstall.sh
 !scripts/raycast-scripts/
