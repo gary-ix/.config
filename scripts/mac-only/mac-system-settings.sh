@@ -60,6 +60,8 @@ mac_file_associations() {
 }
 
 configure_remote_access() {
+  local ard_kickstart='/System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart'
+
   if ! sudo -v; then
     log_error 'Unable to acquire sudo privileges for remote access setup.'
     exit 1
@@ -80,6 +82,14 @@ configure_remote_access() {
     exit 1
   fi
 
+  if ! sudo /usr/sbin/systemsetup -setremotelogin on >/dev/null 2>&1; then
+    log_error 'Failed to set Remote Login to on via systemsetup.'
+    log_error 'Enable it manually in System Settings > General > Sharing > Remote Login.'
+    exit 1
+  fi
+
+  sudo /usr/sbin/dseditgroup -o delete com.apple.access_ssh >/dev/null 2>&1 || true
+
   if ! sudo launchctl enable system/com.apple.screensharing; then
     log_error 'Failed to enable Screen Sharing service.'
     exit 1
@@ -94,8 +104,26 @@ configure_remote_access() {
     exit 1
   fi
 
+  if [[ -x "$ard_kickstart" ]]; then
+    sudo "$ard_kickstart" -activate -configure -allowAccessFor -allUsers >/dev/null 2>&1 || true
+
+    if sudo "$ard_kickstart" -configure -clientopts -setreqperm -reqperm yes -setvnclegacy -vnclegacy no >/dev/null 2>&1; then
+      log_info 'Screen Sharing set to request permission for control with no VNC password mode.'
+    else
+      log_info 'Could not enforce Screen Sharing control-request/no-password options via kickstart on this macOS version.'
+      log_info 'Set this manually in System Settings > General > Sharing > Screen Sharing > i.'
+    fi
+  else
+    log_info "Skipping Screen Sharing option tuning; missing tool: $ard_kickstart"
+  fi
+
+  sudo /usr/sbin/dseditgroup -o delete com.apple.access_screensharing >/dev/null 2>&1 || true
+
   log_info 'Remote Login (SSH) enabled.'
+  log_info 'Remote Login access set to all users.'
   log_info 'Screen Sharing (VNC) enabled.'
+  log_info 'Screen Sharing access set to all users.'
+  log_info 'If needed, enable "Allow full disk access for remote users" in System Settings > General > Sharing > Remote Login > i.'
 
   if [[ -d '/Applications/Tailscale.app' ]]; then
     log_info 'Tailscale app detected. Sign in to attach this Mac to your tailnet.'
