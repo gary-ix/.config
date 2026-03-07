@@ -7,7 +7,7 @@ local muted_color="#7c7d8d"
 local prompt_color="#7c7d8d"
 
 function prompt_context_line() {
-  print -nr -- "%K{${user_bg}}%F{${user_fg}} ⌘ %n %k%f%K{${path_bg}}%F{${path_fg}} %~ %k%f"
+  print -nr -- "%K{${user_bg}}%F{${user_fg}} ⌘ %m %k%f%K{${path_bg}}%F{${path_fg}} %~ %k%f"
 }
 
 function parse_git_branch() {
