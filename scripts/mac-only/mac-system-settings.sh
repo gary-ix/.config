@@ -59,6 +59,53 @@ mac_file_associations() {
   bash "$script_path"
 }
 
+configure_remote_access() {
+  if ! sudo -v; then
+    log_error 'Unable to acquire sudo privileges for remote access setup.'
+    exit 1
+  fi
+
+  if ! sudo launchctl enable system/com.openssh.sshd; then
+    log_error 'Failed to enable sshd service.'
+    log_error 'Enable Remote Login manually in System Settings > General > Sharing.'
+    exit 1
+  fi
+
+  sudo launchctl bootstrap system /System/Library/LaunchDaemons/ssh.plist >/dev/null 2>&1 || true
+  sudo launchctl kickstart -k system/com.openssh.sshd >/dev/null 2>&1 || true
+
+  if ! sudo launchctl print system/com.openssh.sshd >/dev/null 2>&1; then
+    log_error 'Remote Login (SSH) could not be verified as enabled.'
+    log_error 'Enable it manually in System Settings > General > Sharing > Remote Login.'
+    exit 1
+  fi
+
+  if ! sudo launchctl enable system/com.apple.screensharing; then
+    log_error 'Failed to enable Screen Sharing service.'
+    exit 1
+  fi
+
+  sudo launchctl bootstrap system /System/Library/LaunchDaemons/com.apple.screensharing.plist >/dev/null 2>&1 || true
+  sudo launchctl kickstart -k system/com.apple.screensharing >/dev/null 2>&1 || true
+
+  if ! sudo launchctl print system/com.apple.screensharing >/dev/null 2>&1; then
+    log_error 'Screen Sharing service could not be verified as loaded.'
+    log_error 'Enable it manually in System Settings > General > Sharing > Screen Sharing.'
+    exit 1
+  fi
+
+  log_info 'Remote Login (SSH) enabled.'
+  log_info 'Screen Sharing (VNC) enabled.'
+
+  if [[ -d '/Applications/Tailscale.app' ]]; then
+    log_info 'Tailscale app detected. Sign in to attach this Mac to your tailnet.'
+  else
+    log_error 'Tailscale.app not found in /Applications.'
+    log_error 'Install tailscale-app first to use private-network VNC/SSH access.'
+    exit 1
+  fi
+}
+
 first_existing_path() {
   local path
 
@@ -131,6 +178,7 @@ set_black_wallpaper_and_screensaver() {
 main() {
   run_step 'Set Black Wallpaper and Screen Saver' set_black_wallpaper_and_screensaver
   run_step 'Install File Associations' mac_file_associations
+  run_step 'Configure Remote Access' configure_remote_access
   run_step 'Configure Dock' configure_dock
 }
 
