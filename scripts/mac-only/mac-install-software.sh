@@ -50,6 +50,7 @@ main() {
   run_step 'Install Raycast' install_cask raycast
   run_step 'Install Google Chrome' install_cask google-chrome
   run_step 'Install Firefox' install_cask firefox
+  run_step 'Install Tailscale' install_cask tailscale-app
   run_step 'Install Visual Studio Code' install_cask visual-studio-code
   run_step 'Install Cursor' install_cask cursor
 }
