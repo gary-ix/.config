@@ -4,6 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 LIB_DIR="$SCRIPT_DIR/lib"
+HOME_DIR="${HOME:-}"
 
 . "$LIB_DIR/logging.sh"
 . "$LIB_DIR/node-dev-setup.sh"
@@ -94,6 +95,32 @@ install_mac_software() {
   bash "$script_path"
 }
 
+configure_karabiner() {
+  local source_config="$ROOT_DIR/karabiner/karabiner.json"
+  local target_config_dir="$HOME_DIR/.config/karabiner"
+  local target_config="$target_config_dir/karabiner.json"
+
+  if [[ -z "$HOME_DIR" ]]; then
+    log_error 'HOME is not set; cannot configure Karabiner.'
+    exit 1
+  fi
+
+  if [[ ! -f "$source_config" ]]; then
+    log_error "Missing repo Karabiner config: $source_config"
+    exit 1
+  fi
+
+  mkdir -p "$target_config_dir"
+
+  if [[ "$source_config" == "$target_config" ]]; then
+    log_info 'Karabiner config already in expected location.'
+    return
+  fi
+
+  ln -sfn "$source_config" "$target_config"
+  log_info "Linked $target_config -> $source_config"
+}
+
 main() {
   run_step 'Validating platform' ensure_macos
   run_step 'Validating user' ensure_not_root
@@ -102,6 +129,7 @@ main() {
   run_step 'Node Dev Setup' node_dev_setup
   run_step 'ZSH Setup' zsh_setup
   run_step 'Install Mac Software' install_mac_software
+  run_step 'Configure Karabiner' configure_karabiner
   run_step 'Set Mac System Settings' set_mac_system_settings
   log_section 'Done'
   log_info 'mac install complete'
