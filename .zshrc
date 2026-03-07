@@ -50,8 +50,10 @@ setopt HIST_SAVE_NO_DUPS
 setopt EXTENDED_HISTORY
 
 # Key bindings for history search
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
+if (( ${+widgets[history-substring-search-up]} )); then
+  bindkey '^[[A' history-substring-search-up
+  bindkey '^[[B' history-substring-search-down
+fi
 bindkey '^R' history-incremental-search-backward
 
 # Aliases
