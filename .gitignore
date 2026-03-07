@@ -9,7 +9,8 @@
 !.vscode/
 !.vscode/settings.json
 
-# Allow these
+!black.jpg
+
 !aerospace/
 !aerospace/aerospace.toml
 !aerospace/old.aerospace.toml
