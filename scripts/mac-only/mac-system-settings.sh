@@ -96,20 +96,20 @@ add_dock_app() {
 configure_dock() {
   local safari_app
   local notes_app
-  local terminal_app
+  local ghostty_app
   local system_settings_app
   local iphone_mirroring_app
 
   safari_app="$(resolve_required_app_path 'Safari.app' '/Applications/Safari.app' '/System/Cryptexes/App/System/Applications/Safari.app' '/System/Applications/Safari.app')"
   notes_app="$(resolve_required_app_path 'Notes.app' '/System/Applications/Notes.app' '/Applications/Notes.app')"
-  terminal_app="$(resolve_required_app_path 'Terminal.app' '/System/Applications/Utilities/Terminal.app' '/Applications/Utilities/Terminal.app')"
+  ghostty_app="$(resolve_required_app_path 'Ghostty.app' '/Applications/Ghostty.app')"
   system_settings_app="$(resolve_required_app_path 'System Settings.app' '/System/Applications/System Settings.app')"
   iphone_mirroring_app="$(resolve_required_app_path 'iPhone Mirroring.app' '/System/Applications/iPhone Mirroring.app')"
 
   defaults write com.apple.dock persistent-apps -array
   add_dock_app "$safari_app"
   add_dock_app "$notes_app"
-  add_dock_app "$terminal_app"
+  add_dock_app "$ghostty_app"
   add_dock_app "$system_settings_app"
   add_dock_app "$iphone_mirroring_app"
 
