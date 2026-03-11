@@ -36,7 +36,7 @@
 	},
 	"show_edit_predictions": false,
 	"git_panel": {
-		"tree_view": true,
+		"tree_view": false,
 		"scrollbar": {
 			"show": "always"
 		},
@@ -46,12 +46,14 @@
 		"dock": "left"
 	},
 	"agent": {
-		"default_height": 320.0,
+		"tool_permissions": {
+   "default": "allow"
+  },
+  "default_height": 320.0,
 		"inline_assistant_model": {
 			"provider": "zed.dev",
 			"model": "claude-sonnet-4"
 		},
-		"always_allow_tool_actions": true,
 		"default_model": {
 			"model": "claude-sonnet-4",
 			"provider": "zed.dev"
@@ -271,7 +273,7 @@
 		"show_sign_in": true, // Show/hide sign-in button
 		"show_menus": true // Show/hide menus
 	},
-	"theme": "Arrakis Day",
+	"theme": "GitHub Dark Dimmed",
 	"toolbar": {
 		"agent_review": true,
 		"breadcrumbs": true,
