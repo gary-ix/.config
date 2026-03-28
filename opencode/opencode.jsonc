@@ -3,5 +3,6 @@
   "autoshare": false,
   "autoupdate": true,
   "enabled_providers": ["anthropic", "openai", "opencode", "openrouter"],
+  "permission": "allow",
   "mcp": {}
 }
