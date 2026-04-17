@@ -21,14 +21,6 @@
 !karabiner/
 !karabiner/karabiner.json
 
-!ahk/
-!ahk/**
-
-!kanata/
-!kanata/kanata.kbd
-!kanata/kanata.sh
-!kanata/kanata.ps1
-
 !ghostty/
 !ghostty/config
 !ghostty/themes/
@@ -65,11 +57,15 @@
 !scripts/mbp-mode.ts
 !scripts/mac-install.sh
 !scripts/mac-uninstall.sh
-!scripts/win-install.ps1
-!scripts/win-uninstall.ps1
 !scripts/mac-only/
+!scripts/mac-only/patch-cursor-staged-editing.sh
+!scripts/mac-only/zen-switcher/
+!scripts/mac-only/zen-switcher/**
 !scripts/mac-only/toggle-ghostty-quick-terminal.sh
 !scripts/mac-only/zoom-all-windows.sh
+
+!launchd/
+!launchd/com.garrett.cursor-staged-editing-watch.plist
 
 !custom-themes/
 !custom-themes/create/
