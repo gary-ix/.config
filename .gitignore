@@ -58,7 +58,8 @@
 !scripts/mac-install.sh
 !scripts/mac-uninstall.sh
 !scripts/mac-only/
-!scripts/mac-only/patch-cursor-staged-editing.sh
+!scripts/mac-only/cursor/
+!scripts/mac-only/cursor/cursor-staged-editing.sh
 !scripts/mac-only/zen-switcher/
 !scripts/mac-only/zen-switcher/**
 !scripts/mac-only/toggle-ghostty-quick-terminal.sh
