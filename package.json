@@ -7,6 +7,7 @@
 		"format": "biome format --write .",
 		"format:check": "biome format .",
 		"theme": "tsx custom-themes/create/controller.ts",
+		"vscode-install": "bash scripts/vscode-install.sh",
 		"mac:install": "bash scripts/mac-install.sh",
 		"mac:uninstall": "bash scripts/mac-uninstall.sh",
 		"win:install": "powershell -ExecutionPolicy Bypass -File scripts/win-install.ps1",

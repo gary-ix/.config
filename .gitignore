@@ -57,6 +57,7 @@
 !scripts/mbp-mode.ts
 !scripts/mac-install.sh
 !scripts/mac-uninstall.sh
+!scripts/vscode-install.sh
 !scripts/mac-only/
 !scripts/mac-only/cursor/
 !scripts/mac-only/cursor/cursor-staged-editing.sh
@@ -75,6 +76,11 @@
 !custom-themes/output/**
 !custom-themes/vsce-package/
 !custom-themes/vsce-package/**
+
+!vscode-extensions/
+!vscode-extensions/**
+vscode-extensions/**/node_modules/
+vscode-extensions/**/node_modules/**
 
 !zed/
 !zed/keymaps.json
