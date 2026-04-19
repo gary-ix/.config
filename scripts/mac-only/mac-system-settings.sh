@@ -48,6 +48,15 @@ set_black_screensaver() {
   log_info 'Screen saver configured to use black image folder.'
 }
 
+disable_handoff() {
+  defaults -currentHost write com.apple.coreservices.useractivityd ActivityAdvertisingAllowed -bool false
+  defaults -currentHost write com.apple.coreservices.useractivityd ActivityReceivingAllowed -bool false
+  killall useractivityd >/dev/null 2>&1 || true
+  killall Dock >/dev/null 2>&1 || true
+
+  log_info 'Handoff disabled.'
+}
+
 mac_file_associations() {
   local script_path="$SCRIPT_DIR/mac-file-associations.sh"
 
@@ -336,6 +345,7 @@ set_black_wallpaper_and_screensaver() {
 
 main() {
   run_step 'Set Black Wallpaper and Screen Saver' set_black_wallpaper_and_screensaver
+  run_step 'Disable Handoff' disable_handoff
   run_step 'Install File Associations' mac_file_associations
   run_step 'Configure Finder Preferences' configure_finder_preferences
   run_step 'Configure Remote Access' configure_remote_access
