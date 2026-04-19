@@ -279,30 +279,51 @@ add_dock_app() {
 }
 
 configure_dock() {
-  local safari_app
-  local notes_app
-  local ghostty_app
-  local system_settings_app
+  local mission_control_app
   local iphone_mirroring_app
+  local passwords_app
+  local system_settings_app
+  local activity_monitor_app
+  local notes_app
+  local discord_app
+  local ghostty_app
+  local opencode_app
+  local codex_app
+  local vscodium_app
+  local zen_app
 
-  safari_app="$(resolve_required_app_path 'Safari.app' '/Applications/Safari.app' '/System/Cryptexes/App/System/Applications/Safari.app' '/System/Applications/Safari.app')"
-  notes_app="$(resolve_required_app_path 'Notes.app' '/System/Applications/Notes.app' '/Applications/Notes.app')"
-  ghostty_app="$(resolve_required_app_path 'Ghostty.app' '/Applications/Ghostty.app')"
-  system_settings_app="$(resolve_required_app_path 'System Settings.app' '/System/Applications/System Settings.app')"
+  mission_control_app="$(resolve_required_app_path 'Mission Control.app' '/System/Applications/Mission Control.app')"
   iphone_mirroring_app="$(resolve_required_app_path 'iPhone Mirroring.app' '/System/Applications/iPhone Mirroring.app')"
+  passwords_app="$(resolve_required_app_path 'Passwords.app' '/System/Applications/Passwords.app')"
+  system_settings_app="$(resolve_required_app_path 'System Settings.app' '/System/Applications/System Settings.app')"
+  activity_monitor_app="$(resolve_required_app_path 'Activity Monitor.app' '/System/Applications/Utilities/Activity Monitor.app')"
+  notes_app="$(resolve_required_app_path 'Notes.app' '/System/Applications/Notes.app' '/Applications/Notes.app')"
+  discord_app="$(resolve_required_app_path 'Discord.app' '/Applications/Discord.app')"
+  ghostty_app="$(resolve_required_app_path 'Ghostty.app' '/Applications/Ghostty.app')"
+  opencode_app="$(resolve_required_app_path 'OpenCode.app' '/Applications/OpenCode.app')"
+  codex_app="$(resolve_required_app_path 'Codex.app' '/Applications/Codex.app')"
+  vscodium_app="$(resolve_required_app_path 'VSCodium.app' '/Applications/VSCodium.app')"
+  zen_app="$(resolve_required_app_path 'Zen.app' '/Applications/Zen.app')"
 
   defaults write com.apple.dock persistent-apps -array
-  add_dock_app "$safari_app"
-  add_dock_app "$notes_app"
-  add_dock_app "$ghostty_app"
-  add_dock_app "$system_settings_app"
+  add_dock_app "$mission_control_app"
   add_dock_app "$iphone_mirroring_app"
+  add_dock_app "$passwords_app"
+  add_dock_app "$system_settings_app"
+  add_dock_app "$activity_monitor_app"
+  add_dock_app "$notes_app"
+  add_dock_app "$discord_app"
+  add_dock_app "$ghostty_app"
+  add_dock_app "$opencode_app"
+  add_dock_app "$codex_app"
+  add_dock_app "$vscodium_app"
+  add_dock_app "$zen_app"
 
   defaults write com.apple.dock persistent-others -array
   defaults write com.apple.dock show-recents -bool false
   killall Dock >/dev/null 2>&1 || true
 
-  log_info 'Dock updated with chosen apps, no downloads stack, and no recent apps section.'
+  log_info 'Dock updated with the requested app order, no downloads stack, and no recent apps section.'
 }
 
 set_black_wallpaper_and_screensaver() {
