@@ -52,7 +52,7 @@ main() {
   run_step 'Install Firefox' install_cask firefox
   run_step 'Install Tailscale' install_cask tailscale-app
   run_step 'Install Visual Studio Code' install_cask visual-studio-code
-  run_step 'Install Cursor' install_cask cursor
+  run_step 'Install Codex' install_cask codex-app
   run_step 'Install Karabiner-Elements' install_cask karabiner-elements
 }
 
