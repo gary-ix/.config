@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CURSOR_BUNDLE_ID="com.todesktop.230313mzl4w4u92"
+VSCODIUM_BUNDLE_ID="com.vscodium"
 
 if ! command -v duti &> /dev/null; then
     echo "duti not found, installing via Homebrew..."
     brew install duti
 fi
 
-echo "Setting Cursor as default editor for code and config files..."
+echo "Setting VSCodium as default editor for code and config files..."
 
 set_handler() {
-    if ! duti -s "$CURSOR_BUNDLE_ID" "$1" all 2>/dev/null; then
+    if ! duti -s "$VSCODIUM_BUNDLE_ID" "$1" all 2>/dev/null; then
         # Try editor role as fallback for protected types like .html
-        if ! duti -s "$CURSOR_BUNDLE_ID" "$1" editor 2>/dev/null; then
+        if ! duti -s "$VSCODIUM_BUNDLE_ID" "$1" editor 2>/dev/null; then
             echo "  Skipped $1 (protected by macOS)"
         fi
     fi
