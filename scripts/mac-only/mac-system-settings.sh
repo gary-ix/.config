@@ -60,9 +60,22 @@ mac_file_associations() {
 }
 
 configure_remote_access() {
+  local ard_kickstart='/System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart'
+
   if ! sudo -v; then
     log_error 'Unable to acquire sudo privileges for remote access setup.'
     exit 1
+  fi
+
+  if sudo /usr/bin/fdesetup status | /usr/bin/grep -q '^FileVault is On\.'; then
+    if ! sudo /usr/bin/fdesetup disable >/dev/null 2>&1; then
+      log_error 'Failed to disable FileVault.'
+      log_error 'Turn it off manually in System Settings > Privacy & Security > FileVault.'
+      exit 1
+    fi
+    log_info 'FileVault disabled.'
+  else
+    log_info 'FileVault already off.'
   fi
 
   if ! sudo launchctl enable system/com.openssh.sshd; then
@@ -94,16 +107,25 @@ configure_remote_access() {
     exit 1
   fi
 
-  log_info 'Remote Login (SSH) enabled.'
-  log_info 'Screen Sharing (VNC) enabled.'
+  if [[ -x "$ard_kickstart" ]]; then
+    sudo "$ard_kickstart" -activate -configure -allowAccessFor -allUsers >/dev/null 2>&1 || true
 
-  if [[ -d '/Applications/Tailscale.app' ]]; then
-    log_info 'Tailscale app detected. Sign in to attach this Mac to your tailnet.'
+    if ! sudo "$ard_kickstart" -configure -clientopts -setreqperm -reqperm no -setvnclegacy -vnclegacy no >/dev/null 2>&1; then
+      log_error 'Failed to set Screen Sharing to unattended macOS-account login mode.'
+      log_error 'Set this manually in System Settings > General > Sharing > Screen Sharing > i.'
+      exit 1
+    fi
   else
-    log_error 'Tailscale.app not found in /Applications.'
-    log_error 'Install tailscale-app first to use private-network VNC/SSH access.'
+    log_error "Missing Screen Sharing tool: $ard_kickstart"
+    log_error 'Set Screen Sharing access/options manually in System Settings > General > Sharing.'
     exit 1
   fi
+
+  sudo /usr/sbin/dseditgroup -o delete com.apple.access_screensharing >/dev/null 2>&1 || true
+
+  log_info 'Remote Login (SSH) enabled.'
+  log_info 'Screen Sharing (VNC) enabled with macOS username/password login.'
+  log_info 'Screen Sharing access set to all users with no permission prompt.'
 }
 
 first_existing_path() {
