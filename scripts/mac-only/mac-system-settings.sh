@@ -59,6 +59,32 @@ mac_file_associations() {
   bash "$script_path"
 }
 
+configure_finder_preferences() {
+  local home_dir="${HOME:-}"
+
+  if [[ -z "$home_dir" ]]; then
+    log_error 'HOME is not set; cannot configure Finder preferences.'
+    exit 1
+  fi
+
+  defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+  defaults write com.apple.finder FXRemoveOldTrashItems -bool true
+  defaults write com.apple.finder FXDefaultSearchScope -string 'SCcf'
+  defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool false
+  defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool false
+  defaults write com.apple.finder NewWindowTarget -string 'PfHm'
+  defaults write com.apple.finder NewWindowTargetPath -string "file://${home_dir}/"
+
+  killall Finder >/dev/null 2>&1 || true
+
+  log_info 'Finder configured to show filename extensions.'
+  log_info 'Finder configured to remove trash items after 30 days.'
+  log_info 'Finder search configured to search the current folder.'
+  log_info 'Finder configured to hide external disks on the desktop.'
+  log_info 'Finder configured to hide CDs, DVDs, iPods, and removable media on the desktop.'
+  log_info "Finder new windows configured to open $home_dir."
+}
+
 configure_remote_access() {
   local ard_kickstart='/System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart'
 
@@ -126,6 +152,96 @@ configure_remote_access() {
   log_info 'Remote Login (SSH) enabled.'
   log_info 'Screen Sharing (VNC) enabled with macOS username/password login.'
   log_info 'Screen Sharing access set to all users with no permission prompt.'
+}
+
+open_full_disk_access_settings() {
+  /usr/bin/open 'x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles' >/dev/null 2>&1 || true
+  /usr/bin/osascript -e 'tell application "System Settings" to activate' >/dev/null 2>&1 || true
+}
+
+prompt_for_full_disk_access() {
+  log_info 'Finder sidebar setup needs Full Disk Access for your terminal app.'
+  log_info 'Enable Full Disk Access for Terminal, Ghostty, or the app running this script.'
+  sleep 2
+  open_full_disk_access_settings
+
+  if [[ -t 0 ]]; then
+    printf 'Press Enter after enabling Full Disk Access to retry Finder sidebar setup... '
+    read -r
+  fi
+}
+
+configure_finder_sidebar() {
+  local home_dir="${HOME:-}"
+  local code_dir
+  local config_dir
+  local applications_dir='/Applications'
+  local desktop_dir
+  local documents_dir
+  local downloads_dir
+  local pictures_dir
+  local movies_dir
+  local finder_sidebar_script="$SCRIPT_DIR/finder-sidebar.js"
+
+  if [[ -z "$home_dir" ]]; then
+    log_error 'HOME is not set; cannot configure Finder sidebar.'
+    exit 1
+  fi
+
+  if [[ ! -f "$finder_sidebar_script" ]]; then
+    log_error "Missing Finder sidebar script: $finder_sidebar_script"
+    exit 1
+  fi
+
+  if [[ ! -x '/usr/bin/osascript' ]]; then
+    log_error 'osascript is required to configure Finder sidebar favorites.'
+    exit 1
+  fi
+
+  code_dir="$home_dir/code"
+  config_dir="$home_dir/.config"
+  desktop_dir="$home_dir/Desktop"
+  documents_dir="$home_dir/Documents"
+  downloads_dir="$home_dir/Downloads"
+  pictures_dir="$home_dir/Pictures"
+  movies_dir="$home_dir/Movies"
+
+  mkdir -p "$code_dir"
+
+  if ! /usr/bin/osascript -l JavaScript "$finder_sidebar_script" \
+    "$home_dir" \
+    "$config_dir" \
+    "$code_dir" \
+    "$applications_dir" \
+    "$desktop_dir" \
+    "$documents_dir" \
+    "$downloads_dir" \
+    "$pictures_dir" \
+    "$movies_dir"; then
+    prompt_for_full_disk_access
+
+    if ! /usr/bin/osascript -l JavaScript "$finder_sidebar_script" \
+      "$home_dir" \
+      "$config_dir" \
+      "$code_dir" \
+      "$applications_dir" \
+      "$desktop_dir" \
+      "$documents_dir" \
+      "$downloads_dir" \
+      "$pictures_dir" \
+      "$movies_dir"; then
+      log_error 'Failed to configure Finder sidebar favorites.'
+      log_error 'Full Disk Access may still be missing, or the terminal app may need a restart.'
+      exit 1
+    fi
+  fi
+
+  killall sharedfilelistd >/dev/null 2>&1 || true
+  killall Finder >/dev/null 2>&1 || true
+
+  log_info "Finder sidebar pinned: $home_dir"
+  log_info "Finder sidebar pinned: $config_dir"
+  log_info "Finder sidebar pinned: $code_dir"
 }
 
 first_existing_path() {
@@ -200,7 +316,9 @@ set_black_wallpaper_and_screensaver() {
 main() {
   run_step 'Set Black Wallpaper and Screen Saver' set_black_wallpaper_and_screensaver
   run_step 'Install File Associations' mac_file_associations
+  run_step 'Configure Finder Preferences' configure_finder_preferences
   run_step 'Configure Remote Access' configure_remote_access
+  run_step 'Configure Finder Sidebar' configure_finder_sidebar
   run_step 'Configure Dock' configure_dock
 }
 
