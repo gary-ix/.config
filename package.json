@@ -9,11 +9,9 @@
 		"theme": "tsx custom-themes/create/controller.ts",
 		"mac:install": "bash scripts/mac-install.sh",
 		"mac:uninstall": "bash scripts/mac-uninstall.sh",
-		"win:install": "powershell -ExecutionPolicy Bypass -File scripts/win-install.ps1",
-		"win:uninstall": "powershell -ExecutionPolicy Bypass -File scripts/win-uninstall.ps1",
-		"mbp:normal": "sudo npx tsx scripts/mac-only/mbp-mode.ts normal",
-		"mbp:server": "sudo npx tsx scripts/mac-only/mbp-mode.ts server",
-		"mbp:current": "npx tsx scripts/mac-only/mbp-mode.ts current"
+		"mac:power:normal": "sudo npx tsx scripts/mac-only/mac-power-mode.ts normal",
+		"mac:power:server": "sudo npx tsx scripts/mac-only/mac-power-mode.ts server",
+		"mac:power:current": "npx tsx scripts/mac-only/mac-power-mode.ts current"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.4",

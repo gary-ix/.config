@@ -9,8 +9,7 @@
 !.vscode/
 !.vscode/settings.json
 
-!black.jpg
-
+# Allow these
 !aerospace/
 !aerospace/aerospace.toml
 !aerospace/old.aerospace.toml
@@ -21,13 +20,9 @@
 !karabiner/
 !karabiner/karabiner.json
 
-!ahk/
-!ahk/**
-
 !kanata/
 !kanata/kanata.kbd
 !kanata/kanata.sh
-!kanata/kanata.ps1
 
 !ghostty/
 !ghostty/config
@@ -61,15 +56,14 @@
 
 # Scripts
 !scripts/
+!scripts/mac-only/
+!scripts/mac-only/**
 !scripts/setup-file-associations.sh
-!scripts/mbp-mode.ts
+!scripts/mac-only/mac-power-mode.ts
 !scripts/mac-install.sh
 !scripts/mac-uninstall.sh
-!scripts/win-install.ps1
-!scripts/win-uninstall.ps1
-!scripts/mac-only/
-!scripts/mac-only/toggle-ghostty-quick-terminal.sh
-!scripts/mac-only/zoom-all-windows.sh
+!scripts/raycast-scripts/
+!scripts/raycast-scripts/toggle-ghostty-quick-terminal.sh
 
 !custom-themes/
 !custom-themes/create/
