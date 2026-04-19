@@ -4,7 +4,6 @@
 
 # Main config
 macos-titlebar-style = transparent
-macos-icon = chalkboard
 window-save-state = always
 window-padding-x = 8
 window-padding-y = 0
@@ -60,6 +59,7 @@ keybind = cmd+shift+l=new_split:right
 quick-terminal-animation-duration = 0
 quick-terminal-position = center
 quick-terminal-screen = macos-menu-bar
+quick-terminal-size = 50%,50%
 quick-terminal-screen = main
 quick-terminal-autohide = false
 
