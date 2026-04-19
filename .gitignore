@@ -9,8 +9,7 @@
 !.vscode/
 !.vscode/settings.json
 
-!black.jpg
-
+# Allow these
 !aerospace/
 !aerospace/aerospace.toml
 !aerospace/old.aerospace.toml
@@ -53,8 +52,10 @@
 
 # Scripts
 !scripts/
+!scripts/mac-only/
+!scripts/mac-only/**
 !scripts/setup-file-associations.sh
-!scripts/mbp-mode.ts
+!scripts/mac-only/mac-power-mode.ts
 !scripts/mac-install.sh
 !scripts/mac-uninstall.sh
 !scripts/vscode-install.sh
