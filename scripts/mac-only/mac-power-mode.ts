@@ -636,13 +636,9 @@ function main() {
 		return;
 	}
 
-<<<<<<<< HEAD:scripts/mac-only/mac-power-mode.ts
 	console.error(
 		"Usage: tsx scripts/mac-only/mac-power-mode.ts <current|normal|server>",
 	);
-========
-	console.error("Usage: tsx scripts/mac-only/mbp-mode.ts <current|normal|server>");
->>>>>>>> origin/main:scripts/mac-only/mbp-mode.ts
 	process.exit(1);
 }
 
