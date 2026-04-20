@@ -3,33 +3,38 @@
 
 !.gitignore
 
+# root files
 !package.json
 !package-lock.json
 !biome.json
 !.vscode/
 !.vscode/settings.json
 
-# Allow these
+# aerospace
 !aerospace/
 !aerospace/aerospace.toml
-!aerospace/old.aerospace.toml
 
+# borders
 !borders/
 !borders/bordersrc
 
+# karabiner
 !karabiner/
 !karabiner/karabiner.json
 
+# ghostty
 !ghostty/
 !ghostty/config
 !ghostty/themes/
 !ghostty/themes/**
 
+# nvim
 !nvim/
 !nvim/init.lua
 !nvim/colors/
 !nvim/colors/**
 
+# opencode
 !opencode/
 !opencode/opencode.json
 !opencode/opencode.jsonc
@@ -65,11 +70,13 @@
 !scripts/mac-only/zen-switcher/
 !scripts/mac-only/zen-switcher/**
 !scripts/mac-only/toggle-ghostty-quick-terminal.sh
-!scripts/mac-only/zoom-all-windows.sh
+!scripts/mac-only/zoom-all-window.sh
 
+# launchd
 !launchd/
 !launchd/com.garrett.cursor-staged-editing-watch.plist
 
+# custom-themes
 !custom-themes/
 !custom-themes/create/
 !custom-themes/create/**
@@ -78,14 +85,17 @@
 !custom-themes/vsce-package/
 !custom-themes/vsce-package/**
 
+# vscode-extensions
 !vscode-extensions/
 !vscode-extensions/**
 vscode-extensions/**/node_modules/
 vscode-extensions/**/node_modules/**
 
+# zed
 !zed/
 !zed/keymaps.json
 !zed/settings.json
 
+# misc
 .DS_Store
 **/.DS_Store
