@@ -95,8 +95,6 @@ configure_finder_preferences() {
 }
 
 configure_remote_access() {
-  local ard_kickstart='/System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart'
-
   if ! sudo -v; then
     log_error 'Unable to acquire sudo privileges for remote access setup.'
     exit 1
@@ -113,7 +111,7 @@ configure_remote_access() {
     log_info 'FileVault already off.'
   fi
 
-  if ! sudo launchctl enable system/com.openssh.sshd; then
+  if ! sudo systemsetup -setremotelogin on >/dev/null 2>&1; then
     log_error 'Failed to enable sshd service.'
     log_error 'Enable Remote Login manually in System Settings > General > Sharing.'
     exit 1
@@ -142,25 +140,8 @@ configure_remote_access() {
     exit 1
   fi
 
-  if [[ -x "$ard_kickstart" ]]; then
-    sudo "$ard_kickstart" -activate -configure -allowAccessFor -allUsers >/dev/null 2>&1 || true
-
-    if ! sudo "$ard_kickstart" -configure -clientopts -setreqperm -reqperm no -setvnclegacy -vnclegacy no >/dev/null 2>&1; then
-      log_error 'Failed to set Screen Sharing to unattended macOS-account login mode.'
-      log_error 'Set this manually in System Settings > General > Sharing > Screen Sharing > i.'
-      exit 1
-    fi
-  else
-    log_error "Missing Screen Sharing tool: $ard_kickstart"
-    log_error 'Set Screen Sharing access/options manually in System Settings > General > Sharing.'
-    exit 1
-  fi
-
-  sudo /usr/sbin/dseditgroup -o delete com.apple.access_screensharing >/dev/null 2>&1 || true
-
   log_info 'Remote Login (SSH) enabled.'
-  log_info 'Screen Sharing (VNC) enabled with macOS username/password login.'
-  log_info 'Screen Sharing access set to all users with no permission prompt.'
+  log_info 'Screen Sharing enabled for native macOS login-window access.'
 }
 
 open_full_disk_access_settings() {
