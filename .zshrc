@@ -65,6 +65,9 @@ alias h='history'
 alias reload='source ~/.zshrc'
 
 # Env vars
+export TERM=xterm-256color
+
+# Github token from keychain or gh cli
 if [[ "$is_macos" == true ]] && command -v security >/dev/null 2>&1; then
   token="$(security find-generic-password -s "GITHUB_TOKEN" -w 2>/dev/null || true)"
   [[ -n "$token" ]] && export GITHUB_TOKEN="$token"
@@ -74,12 +77,17 @@ elif [[ -z "${GITHUB_TOKEN:-}" ]] && command -v gh >/dev/null 2>&1; then
 fi
 unset token
 
+# AWS
 export AWS_PROFILE=tradester-test
 export AWS_REGION=us-east-1
 
+# NVM
 export NVM_DIR="$HOME/.nvm"
 [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
 [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
 
+# Path
 export PATH="$HOME/.local/bin:$PATH"
+
+# Opencode
 [[ -d "$HOME/.opencode/bin" ]] && export PATH="$HOME/.opencode/bin:$PATH"
