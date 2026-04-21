@@ -34,6 +34,38 @@ install_cask() {
   log_info "$cask_name installed."
 }
 
+install_formula() {
+  local formula_name="$1"
+
+  if brew list --formula "$formula_name" >/dev/null 2>&1; then
+    log_info "$formula_name already installed."
+    return
+  fi
+
+  log_info "Installing $formula_name..."
+  brew install "$formula_name"
+  log_info "$formula_name installed."
+}
+
+install_tailscale_service() {
+  if brew list --cask tailscale-app >/dev/null 2>&1; then
+    log_info 'Removing tailscale-app so the boot-time daemon can be used instead.'
+    brew uninstall --cask tailscale-app
+  fi
+
+  install_formula tailscale
+
+  if sudo brew services list | grep -Eq '^tailscale\s+started\b'; then
+    log_info 'tailscale service already started.'
+    return
+  fi
+
+  log_info 'Starting tailscale system service...'
+  sudo brew services start tailscale
+  log_info 'tailscale system service started.'
+  log_info 'Run sudo tailscale up to authenticate this Mac if it is not already connected.'
+}
+
 install_opencode_desktop() {
   if brew list --cask opencode-desktop >/dev/null 2>&1; then
     log_info 'opencode-desktop already installed.'
@@ -63,7 +95,7 @@ main() {
   run_step 'Install Ghostty' install_cask ghostty
   run_step 'Install Karabiner-Elements' install_cask karabiner-elements
   run_step 'Install BetterDisplay' install_cask betterdisplay
-  run_step 'Install Tailscale' install_cask tailscale-app
+  run_step 'Install Tailscale' install_tailscale_service
   run_step 'Install balenaEtcher' install_cask balenaetcher
   run_step 'Install Raycast' install_cask raycast
   run_step 'Install Visual Studio Code' install_cask visual-studio-code
