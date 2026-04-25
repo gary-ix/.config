@@ -28,6 +28,10 @@
 !ghostty/themes/
 !ghostty/themes/**
 
+# tmux
+!tmux/
+!tmux/tmux.conf
+
 # nvim
 !nvim/
 !nvim/init.lua

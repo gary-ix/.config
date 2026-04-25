@@ -91,3 +91,4 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # Opencode
 [[ -d "$HOME/.opencode/bin" ]] && export PATH="$HOME/.opencode/bin:$PATH"
+export PATH=/Users/garrett/.opencode/bin:$PATH
