@@ -121,6 +121,24 @@ configure_karabiner() {
   log_info "Linked $target_config -> $source_config"
 }
 
+configure_tmux() {
+  local source_config="$ROOT_DIR/tmux/tmux.conf"
+  local target_config="$HOME_DIR/.tmux.conf"
+
+  if [[ -z "$HOME_DIR" ]]; then
+    log_error 'HOME is not set; cannot configure tmux.'
+    exit 1
+  fi
+
+  if [[ ! -f "$source_config" ]]; then
+    log_error "Missing repo tmux config: $source_config"
+    exit 1
+  fi
+
+  ln -sfn "$source_config" "$target_config"
+  log_info "Linked $target_config -> $source_config"
+}
+
 main() {
   run_step 'Validating platform' ensure_macos
   run_step 'Validating user' ensure_not_root
@@ -129,6 +147,7 @@ main() {
   run_step 'Node Dev Setup' node_dev_setup
   run_step 'ZSH Setup' zsh_setup
   run_step 'Install Mac Software' install_mac_software
+  run_step 'Configure tmux' configure_tmux
   run_step 'Configure Karabiner' configure_karabiner
   run_step 'Set Mac System Settings' set_mac_system_settings
   log_section 'Done'
