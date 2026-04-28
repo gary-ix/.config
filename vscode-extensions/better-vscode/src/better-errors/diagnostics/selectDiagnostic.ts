@@ -14,38 +14,37 @@ export function selectDiagnostic<TDiagnostic>(
 	const containing = diagnostics.filter((item) => containsPosition(item.range, activePosition));
 
 	if (containing.length > 0) {
-		return sortDiagnostics(containing)[0]?.diagnostic;
+		return [...containing].sort(compareSelectableDiagnostics)[0]?.diagnostic;
 	}
 
 	const intersecting = diagnostics.filter((item) => intersectsRange(item.range, selection));
 
-	return sortDiagnostics(intersecting)[0]?.diagnostic;
+	return [...intersecting].sort(compareSelectableDiagnostics)[0]?.diagnostic;
 }
 
-function sortDiagnostics<TDiagnostic>(
-	diagnostics: readonly SelectableDiagnostic<TDiagnostic>[],
-): SelectableDiagnostic<TDiagnostic>[] {
-	return [...diagnostics].sort((left, right) => {
-		const severityDelta = severityRank(left.severity) - severityRank(right.severity);
+export function compareSelectableDiagnostics<TDiagnostic>(
+	left: SelectableDiagnostic<TDiagnostic>,
+	right: SelectableDiagnostic<TDiagnostic>,
+): number {
+	const severityDelta = severityRank(left.severity) - severityRank(right.severity);
 
-		if (severityDelta !== 0) {
-			return severityDelta;
-		}
+	if (severityDelta !== 0) {
+		return severityDelta;
+	}
 
-		const spanDelta = rangeSpan(left.range) - rangeSpan(right.range);
+	const spanDelta = rangeSpan(left.range) - rangeSpan(right.range);
 
-		if (spanDelta !== 0) {
-			return spanDelta;
-		}
+	if (spanDelta !== 0) {
+		return spanDelta;
+	}
 
-		const startDelta = comparePosition(left.range.start, right.range.start);
+	const startDelta = comparePosition(left.range.start, right.range.start);
 
-		if (startDelta !== 0) {
-			return startDelta;
-		}
+	if (startDelta !== 0) {
+		return startDelta;
+	}
 
-		return comparePosition(left.range.end, right.range.end);
-	});
+	return comparePosition(left.range.end, right.range.end);
 }
 
 function containsPosition(range: BetterErrorRange, position: BetterErrorPosition): boolean {
