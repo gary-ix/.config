@@ -1,6 +1,6 @@
 {
-	"name": "vscode-themes",
-	"displayName": "vscode-themes",
+	"name": "better-vscode-themes",
+	"displayName": "better-vscode-themes",
 	"publisher": "gary-ix",
 	"version": "1.1.0",
 	"license": "SEE LICENSE IN LICENSE.txt",
@@ -13,7 +13,7 @@
 	},
 	"scripts": {
 		"build": "vsce package && npm run install:cursor",
-		"install:cursor": "ELECTRON_RUN_AS_NODE=1 \"/Applications/Cursor.app/Contents/MacOS/Cursor\" \"/Applications/Cursor.app/Contents/Resources/app/out/cli.js\" --install-extension \"./vscode-themes-$npm_package_version.vsix\" --force",
+		"install:cursor": "ELECTRON_RUN_AS_NODE=1 \"/Applications/Cursor.app/Contents/MacOS/Cursor\" \"/Applications/Cursor.app/Contents/Resources/app/out/cli.js\" --install-extension \"./better-vscode-themes-$npm_package_version.vsix\" --force",
 		"deploy": "vsce publish"
 	},
 	"keywords": [
