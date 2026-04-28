@@ -90,6 +90,11 @@
 !vscode-extensions/**
 vscode-extensions/**/node_modules/
 vscode-extensions/**/node_modules/**
+vscode-extensions/**/dist/
+vscode-extensions/**/dist/**
+vscode-extensions/**/dist-test/
+vscode-extensions/**/dist-test/**
+vscode-extensions/**/*.vsix
 
 # zed
 !zed/
