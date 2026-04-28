@@ -3,6 +3,7 @@
 	"displayName": "better-vscode",
 	"description": "Editor productivity tools for VS Code, starting with better-errors.",
 	"version": "0.0.1",
+	"icon": "icon.png",
 	"publisher": "gary-ix",
 	"license": "MIT",
 	"private": true,
