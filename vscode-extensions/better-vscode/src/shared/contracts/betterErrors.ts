@@ -21,6 +21,38 @@ export type BetterErrorRelatedInformation = {
 	message: string;
 };
 
+export type BetterErrorCodeSnippet = {
+	filePath: string;
+	range: BetterErrorRange;
+	languageId: string;
+	text: string;
+};
+
+export type BetterErrorReference = {
+	filePath: string;
+	range: BetterErrorRange;
+	snippet: string;
+};
+
+export type BetterErrorCallHierarchyItem = {
+	name: string;
+	filePath: string;
+	range: BetterErrorRange;
+};
+
+export type BetterErrorCallHierarchy = {
+	incoming: readonly BetterErrorCallHierarchyItem[];
+	outgoing: readonly BetterErrorCallHierarchyItem[];
+};
+
+export type BetterErrorPrimarySymbol = {
+	name: string;
+	selectedExpression: string;
+	hoverText?: string;
+	definition?: BetterErrorCodeSnippet;
+	typeDefinition?: BetterErrorCodeSnippet;
+};
+
 export type BetterErrorDiagnostic = {
 	filePath: string;
 	documentLanguageId: string;
@@ -32,8 +64,12 @@ export type BetterErrorDiagnostic = {
 	source?: string;
 	code?: string;
 	relatedInformation: readonly BetterErrorRelatedInformation[];
-	selectedText: string;
 	contextText: string;
+	activeScope?: BetterErrorCodeSnippet;
+	definition?: BetterErrorCodeSnippet;
+	typeDefinition?: BetterErrorCodeSnippet;
+	references: readonly BetterErrorReference[];
+	callHierarchy?: BetterErrorCallHierarchy;
 };
 
 export type BetterErrorPromptInput = {

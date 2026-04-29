@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { buildCopyErrorPrompt } from "../../../src/better-errors/prompting/buildCopyErrorPrompt";
 import type { BetterErrorDiagnostic } from "../../../src/shared/contracts/betterErrors";
 
-test("buildCopyErrorPrompt preserves the raw diagnostic and includes metadata", () => {
+test("buildCopyErrorPrompt includes trimmed high-signal sections", () => {
 	const diagnostic: BetterErrorDiagnostic = {
 		filePath: "src/app.ts",
 		documentLanguageId: "typescript",
@@ -31,29 +31,87 @@ test("buildCopyErrorPrompt preserves the raw diagnostic and includes metadata", 
 				message: "'count' is declared here.",
 			},
 		],
-		selectedText: "  count: value,\n",
 		contextText: "const payload = {\n  count: value,\n};\n",
+		activeScope: {
+			filePath: "src/app.ts",
+			range: {
+				start: { line: 2, character: 0 },
+				end: { line: 6, character: 1 },
+			},
+			languageId: "typescript",
+			text: "const payload = {\n  count: value,\n};\n",
+		},
+		definition: {
+			filePath: "src/value.ts",
+			range: {
+				start: { line: 0, character: 13 },
+				end: { line: 0, character: 18 },
+			},
+			languageId: "typescript",
+			text: "export const value = 'x';\n",
+		},
+		typeDefinition: {
+			filePath: "src/types.ts",
+			range: {
+				start: { line: 0, character: 0 },
+				end: { line: 0, character: 22 },
+			},
+			languageId: "typescript",
+			text: "export type Count = number;\n",
+		},
+		references: [
+			{
+				filePath: "src/a.ts",
+				range: {
+					start: { line: 9, character: 2 },
+					end: { line: 9, character: 7 },
+				},
+				snippet: "foo(value)",
+			},
+		],
+		callHierarchy: {
+			incoming: [
+				{
+					name: "buildPayload",
+					filePath: "src/a.ts",
+					range: {
+						start: { line: 9, character: 0 },
+						end: { line: 9, character: 12 },
+					},
+				},
+			],
+			outgoing: [
+				{
+					name: "normalizeValue",
+					filePath: "src/value.ts",
+					range: {
+						start: { line: 2, character: 0 },
+						end: { line: 2, character: 14 },
+					},
+				},
+			],
+		},
 	};
 
 	const prompt = buildCopyErrorPrompt({ diagnostic });
 
-	assert.match(prompt, /file_path: src\/app\.ts/);
-	assert.match(prompt, /language: typescript/);
-	assert.match(prompt, /range: 5:3-5:19/);
-	assert.match(prompt, /selection_range: 5:1-7:2/);
-	assert.match(prompt, /severity: error/);
-	assert.match(prompt, /source: ts/);
-	assert.match(prompt, /code: 2322/);
-	assert.match(
-		prompt,
-		/raw_error: \|\n  Type 'string' is not assignable to type 'number'\.\n    The expected type comes from property 'count'\./,
-	);
-	assert.match(prompt, /```typescript\n  count: value,\n\n```/);
-	assert.match(prompt, /Local context:\n```typescript\nconst payload = \{\n  count: value,\n\};\n\n```/);
+	assert.match(prompt, /## Raw Diagnostic/);
+	assert.match(prompt, /- File: src\/app\.ts/);
+	assert.match(prompt, /## Active Scope\n- File: src\/app\.ts\n- Range: 3:1-7:2\n```typescript/);
+	assert.match(prompt, /## Definition Snippet\n- File: src\/value\.ts/);
+	assert.match(prompt, /## Type Definition Snippet\n- File: src\/types\.ts/);
+	assert.match(prompt, /## Related Diagnostics/);
 	assert.match(prompt, /- src\/types\.ts:1:14-1:19 'count' is declared here\./);
+	assert.match(prompt, /## References/);
+	assert.match(prompt, /- src\/a\.ts:10:3-10:8 foo\(value\)/);
+	assert.match(prompt, /## Call Hierarchy/);
+	assert.match(prompt, /- Called by: buildPayload in src\/a\.ts:10:1-10:13/);
+	assert.match(prompt, /- Calls into: normalizeValue in src\/value\.ts:3:1-3:15/);
+	assert.doesNotMatch(prompt, /## Facts/);
+	assert.doesNotMatch(prompt, /## Primary Symbol/);
 });
 
-test("buildCopyErrorPrompt uses placeholders for empty selection and context", () => {
+test("buildCopyErrorPrompt includes placeholders when optional evidence is missing", () => {
 	const diagnostic: BetterErrorDiagnostic = {
 		filePath: "main.py",
 		documentLanguageId: "python",
@@ -69,16 +127,16 @@ test("buildCopyErrorPrompt uses placeholders for empty selection and context", (
 		message: "Unused variable 'x'",
 		rawMessage: "Unused variable 'x'",
 		relatedInformation: [],
-		selectedText: "",
 		contextText: "",
+		references: [],
 	};
 
 	const prompt = buildCopyErrorPrompt({ diagnostic });
 
-	assert.match(prompt, /<no explicit selection>/);
-	assert.match(prompt, /<no local context>/);
-	assert.doesNotMatch(prompt, /Related diagnostic info:/);
-	assert.doesNotMatch(prompt, /(^|\n)source: /m);
-	assert.doesNotMatch(prompt, /(^|\n)code: /m);
-	assert.match(prompt, /raw_error: \|\n  Unused variable 'x'/);
+	assert.match(prompt, /## Active Scope\n- <no enclosing scope found>/);
+	assert.match(prompt, /## Definition Snippet\n- <no definition found>/);
+	assert.match(prompt, /## Type Definition Snippet\n- <no type definition found>/);
+	assert.match(prompt, /## Related Diagnostics\n- <no related diagnostics>/);
+	assert.match(prompt, /## References\n- <no references found>/);
+	assert.match(prompt, /## Call Hierarchy\n- <no call hierarchy available>/);
 });

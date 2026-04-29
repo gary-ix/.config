@@ -18,7 +18,12 @@ export const BETTER_ERRORS_CONFIG = {
 
 export const BETTER_ERRORS_PROMPT_DEFAULTS = {
 	instruction:
-		"Help me fix this editor error. Keep the full raw diagnostic intact, explain the root cause in plain English, and suggest the smallest safe fix.",
-	emptySelectionPlaceholder: "<no explicit selection>",
+		"You are investigating a real editor error in a codebase. Use the diagnostic and project evidence below to find the most likely root cause. Prefer project-specific evidence over generic advice.",
 	emptyContextPlaceholder: "<no local context>",
+	emptyActiveScopePlaceholder: "<no enclosing scope found>",
+	emptyDefinitionPlaceholder: "<no definition found>",
+	emptyTypeDefinitionPlaceholder: "<no type definition found>",
+	emptyRelatedDiagnosticsPlaceholder: "<no related diagnostics>",
+	emptyReferencesPlaceholder: "<no references found>",
+	emptyCallHierarchyPlaceholder: "<no call hierarchy available>",
 } as const;
