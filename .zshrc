@@ -89,8 +89,5 @@ export NVM_DIR="$HOME/.nvm"
 # Path
 export PATH="$HOME/.local/bin:$PATH"
 
-# Opencode
-[[ -d "$HOME/.opencode/bin" ]] && export PATH="$HOME/.opencode/bin:$PATH"
-
 # opencode
 export PATH=/Users/garrett/.opencode/bin:$PATH
