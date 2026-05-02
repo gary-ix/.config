@@ -9,6 +9,33 @@
             "complex_modifications": {
                 "rules": [
                     {
+                        "description": "SUPER KEY: Left+Right Command chord primes next key with Ctrl+Opt+Shift.",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "simultaneous": [
+                                        { "key_code": "left_command" },
+                                        { "key_code": "right_command" }
+                                    ],
+                                    "simultaneous_options": {
+                                        "detect_key_down_uninterruptedly": true,
+                                        "key_down_order": "insensitive",
+                                        "key_up_order": "insensitive",
+                                        "key_up_when": "any"
+                                    },
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "parameters": { "basic.simultaneous_threshold_milliseconds": 200 },
+                                "to": [
+                                    { "sticky_modifier": { "left_control": "on" } },
+                                    { "sticky_modifier": { "left_option": "on" } },
+                                    { "sticky_modifier": { "left_shift": "on" } }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "SUPER KEY: Caps Lock hold gives Ctrl+Opt+Shift.",
                         "manipulators": [
                             {
