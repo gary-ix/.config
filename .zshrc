@@ -60,9 +60,21 @@ bindkey '^R' history-incremental-search-backward
 if command grep --help 2>&1 | command grep -q -- '--color'; then
   alias grep='grep --color=auto'
 fi
-alias cls='clear'
-alias h='history'
+# Reload zshrc
 alias reload='source ~/.zshrc'
+# Clear screen
+alias cls='clear'
+# History
+alias h='history'
+# Copy to clipboard and print to terminal
+alias -g yank='| tee /dev/tty | pbcopy'
+# Git
+alias gcm='git commit -m'
+alias gstash='git stash -u'
+alias gapply='git stash apply'
+alias gclean-dry='git clean -nd'
+alias gclean='git clean -fd'
+
 
 # Env vars
 export TERM=xterm-256color
