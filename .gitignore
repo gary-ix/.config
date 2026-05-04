@@ -80,6 +80,13 @@
 !launchd/
 !launchd/com.garrett.cursor-staged-editing-watch.plist
 
+# home-assistant helpers
+!.home-assistant/
+!.home-assistant/README.md
+!.home-assistant/tv-volume
+!.home-assistant/tv-volume.env.example
+.home-assistant/tv-volume.env
+
 # custom-themes
 !custom-themes/
 !custom-themes/create/
