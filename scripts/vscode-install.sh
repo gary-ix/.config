@@ -19,7 +19,7 @@ for extension_dir in "$EXTENSIONS_DIR"/*; do
 
 	installed_any=true
 	printf '\n==> Installing %s\n' "$(basename "$extension_dir")"
-	(cd "$extension_dir" && npm install && npm run build)
+	(cd "$extension_dir" && npm install && npm run build && npm run install:cursor --if-present)
 done
 
 if [ "$installed_any" = false ]; then
