@@ -26,14 +26,17 @@
 	],
 	"main": "./dist/extension.js",
 	"activationEvents": [
-		"onStartupFinished",
-		"onCommand:betterErrors.copyError"
+		"onStartupFinished"
 	],
 	"contributes": {
 		"commands": [
 			{
 				"command": "betterErrors.copyError",
 				"title": "better-errors: Copy Error"
+			},
+			{
+				"command": "betterErrors.toggleEnabled",
+				"title": "better-errors: Toggle Enabled"
 			}
 		],
 		"menus": {
@@ -55,6 +58,11 @@
 		"configuration": {
 			"title": "better-vscode",
 			"properties": {
+				"betterErrors.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable better-errors commands and CodeLens actions."
+				},
 				"betterErrors.includeWorkspaceRelativePath": {
 					"type": "boolean",
 					"default": true,

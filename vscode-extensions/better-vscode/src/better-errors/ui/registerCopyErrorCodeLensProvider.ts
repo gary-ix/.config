@@ -3,6 +3,7 @@ import * as vscode from "vscode";
 import {
 	BETTER_ERRORS_COMMANDS,
 	BETTER_ERRORS_COMMAND_TITLES,
+	BETTER_ERRORS_CONFIG,
 } from "../../shared/consts/betterErrors";
 import { selectCodeLensDiagnostics } from "../diagnostics/selectCodeLensDiagnostics";
 
@@ -17,6 +18,10 @@ export function registerCopyErrorCodeLensProvider(): vscode.Disposable {
 		{
 			onDidChangeCodeLenses: onDidChangeCodeLenses.event,
 			provideCodeLenses(document) {
+				if (!isBetterErrorsEnabled()) {
+					return [];
+				}
+
 				const diagnostics = selectCodeLensDiagnostics(
 					vscode.languages.getDiagnostics(document.uri).map((diagnostic) => ({
 						diagnostic,
@@ -50,7 +55,28 @@ export function registerCopyErrorCodeLensProvider(): vscode.Disposable {
 		onDidChangeCodeLenses.fire();
 	});
 
-	return vscode.Disposable.from(provider, diagnosticsSubscription, onDidChangeCodeLenses);
+	const configurationSubscription = vscode.workspace.onDidChangeConfiguration((event) => {
+		if (
+			event.affectsConfiguration(
+				`${BETTER_ERRORS_CONFIG.root}.${BETTER_ERRORS_CONFIG.enabled}`,
+			)
+		) {
+			onDidChangeCodeLenses.fire();
+		}
+	});
+
+	return vscode.Disposable.from(
+		provider,
+		diagnosticsSubscription,
+		configurationSubscription,
+		onDidChangeCodeLenses,
+	);
+}
+
+function isBetterErrorsEnabled(): boolean {
+	return vscode.workspace
+		.getConfiguration(BETTER_ERRORS_CONFIG.root)
+		.get(BETTER_ERRORS_CONFIG.enabled, true);
 }
 
 function formatSeverity(severity: vscode.DiagnosticSeverity):
