@@ -1,0 +1,261 @@
+#!/usr/bin/env bash
+
+# tv-volume
+#
+# Purpose:
+#   Send TV speaker volume commands from this Mac to a TCL Google TV through
+#   Home Assistant's Android TV Remote integration.
+#
+# Intended flow:
+#   BetterDisplay / a macOS hotkey tool / Terminal
+#     -> this script
+#     -> Home Assistant REST API
+#     -> Home Assistant Android TV Remote integration
+#     -> TCL Google TV volume command
+#
+# Why Home Assistant is in the middle:
+#   The Google Home app already controls the TV, which means the TV accepts
+#   Google/Android TV remote commands on the local network. Home Assistant's
+#   Android TV Remote integration uses that same class of local remote control
+#   and exposes it through a simple REST API that this script can call.
+#
+# Why this does not use BetterDisplay DDC volume directly:
+#   BetterDisplay's normal volume slider only works when the display exposes
+#   hardware/DDC volume. Many TVs expose a volume-looking control to macOS or
+#   BetterDisplay but do not actually wire it to the TV speakers. This script
+#   bypasses DDC and sends real TV remote volume commands instead.
+
+# Strict mode:
+#   -e: exit immediately if a command fails
+#   -u: error on unset variables
+#   -o pipefail: fail a pipeline if any command in the pipeline fails
+#
+# This is intentional because BetterDisplay/hotkey integrations should fail
+# loudly during setup instead of silently doing nothing.
+set -euo pipefail
+
+# Resolve the directory this script lives in.
+#
+# This matters because you said the script needs to live in this .config folder.
+# The config file is loaded from the same folder by default, regardless of the
+# current working directory used by BetterDisplay or Terminal.
+#
+# Example:
+#   Script: /Users/garrett/.config/.home-assistant/tv-volume
+#   Config: /Users/garrett/.config/.home-assistant/tv-volume.env
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+
+# Optional config file.
+#
+# Default:
+#   ./tv-volume.env next to this script
+#
+# Override:
+#   TV_VOLUME_CONFIG=/some/other/file ./tv-volume up
+#
+# Expected file contents:
+#   HA_URL="http://192.168.1.50:8123"
+#   HA_TOKEN="eyJ..."
+#   TV_REMOTE_ENTITY="remote.living_room_tv"
+#
+# Keep tv-volume.env private because HA_TOKEN can control Home Assistant.
+CONFIG_FILE="${TV_VOLUME_CONFIG:-${SCRIPT_DIR}/tv-volume.env}"
+
+# Load config if present.
+#
+# This uses normal shell syntax so values can be quoted and copied easily.
+# Environment variables set before running the script still work too; values
+# from this file will become regular shell variables for the rest of the script.
+if [ -f "$CONFIG_FILE" ]; then
+  # shellcheck disable=SC1090
+  . "$CONFIG_FILE"
+fi
+
+# Home Assistant base URL.
+#
+# Use a static IP if possible for reliability, for example:
+#   HA_URL="http://192.168.1.50:8123"
+#
+# homeassistant.local can work, but mDNS occasionally fails depending on the
+# router, VPN state, DNS setup, or which machine is calling the command.
+HA_URL="${HA_URL:-http://homeassistant.local:8123}"
+
+# Home Assistant long-lived access token.
+#
+# Create it in Home Assistant:
+#   Profile -> Security -> Long-lived access tokens -> Create token
+#
+# The token is sent as:
+#   Authorization: Bearer <token>
+#
+# Do not paste this token into BetterDisplay directly if you can avoid it. Keep
+# it in tv-volume.env so BetterDisplay only needs to call this script.
+HA_TOKEN="${HA_TOKEN:-}"
+
+# Home Assistant remote entity for the TCL TV.
+#
+# This should normally be the remote.* entity created by the Android TV Remote
+# integration, not the media_player.* entity.
+#
+# Find candidates with:
+#   ./tv-volume entities
+#
+# Example:
+#   TV_REMOTE_ENTITY="remote.tcl_55_qm6k"
+TV_REMOTE_ENTITY="${TV_REMOTE_ENTITY:-}"
+
+# Print an error in a consistent format and exit.
+die() {
+  printf 'tv-volume: %s\n' "$*" >&2
+  exit 1
+}
+
+# Show usage and config help.
+#
+# Commands intended for BetterDisplay/hotkey use:
+#   up
+#   down
+#   mute
+#
+# Commands intended for setup/debugging:
+#   test     checks Home Assistant API/auth connectivity
+#   entities lists remote.* and media_player.* entities to find the TCL remote
+usage() {
+  cat >&2 <<'EOF'
+Usage:
+  ./tv-volume up
+  ./tv-volume down
+  ./tv-volume mute
+  ./tv-volume test
+  ./tv-volume entities
+
+Config:
+  Put this in ./tv-volume.env or export these variables:
+
+  HA_URL="http://YOUR_HOME_ASSISTANT_IP:8123"
+  HA_TOKEN="YOUR_LONG_LIVED_ACCESS_TOKEN"
+  TV_REMOTE_ENTITY="remote.YOUR_TCL_REMOTE_ENTITY"
+
+Notes:
+  - Run ./tv-volume test first.
+  - Run ./tv-volume entities to list remote/media_player entities.
+EOF
+  exit 2
+}
+
+# Require HA_TOKEN before making any Home Assistant API request.
+#
+# Without this check, Home Assistant would return 401 Unauthorized. This message
+# is clearer when setup is incomplete.
+need_token() {
+  [ -n "$HA_TOKEN" ] || die "missing HA_TOKEN. Add it to ${CONFIG_FILE}"
+}
+
+# Make an authenticated GET request to Home Assistant.
+#
+# Used for:
+#   /api/        basic API health/auth test
+#   /api/states  entity discovery
+#
+# curl flags:
+#   --silent      hide progress meter
+#   --show-error  still print errors when --silent is used
+#   --fail        treat HTTP 4xx/5xx as command failure
+ha_get() {
+  need_token
+  curl --silent --show-error --fail \
+    -H "Authorization: Bearer ${HA_TOKEN}" \
+    -H "Content-Type: application/json" \
+    "$HA_URL$1"
+}
+
+# Make an authenticated POST request to Home Assistant.
+#
+# Used for calling services, specifically:
+#   /api/services/remote/send_command
+#
+# Home Assistant expects JSON and the bearer token header. The response body is
+# discarded because BetterDisplay/hotkey callers only need success/failure.
+ha_post() {
+  need_token
+  curl --silent --show-error --fail \
+    -X POST \
+    -H "Authorization: Bearer ${HA_TOKEN}" \
+    -H "Content-Type: application/json" \
+    -d "$2" \
+    "$HA_URL$1" >/dev/null
+}
+
+# Send one Android TV remote command through Home Assistant.
+#
+# Home Assistant service:
+#   domain:  remote
+#   service: send_command
+#   endpoint: /api/services/remote/send_command
+#
+# Payload shape:
+#   {
+#     "entity_id": "remote.tcl_55_qm6k",
+#     "command": "VOLUME_UP"
+#   }
+#
+# The commands used here come from Home Assistant's Android TV Remote command
+# names. They map to real remote button presses rather than DDC volume.
+send_remote_command() {
+  [ -n "$TV_REMOTE_ENTITY" ] || die "missing TV_REMOTE_ENTITY. Run ./tv-volume entities, then add it to ${CONFIG_FILE}"
+  ha_post "/api/services/remote/send_command" \
+    "{\"entity_id\":\"${TV_REMOTE_ENTITY}\",\"command\":\"$1\"}"
+}
+
+# Main command dispatcher.
+#
+# BetterDisplay should call one of these absolute commands:
+#   /Users/garrett/.config/.home-assistant/tv-volume up
+#   /Users/garrett/.config/.home-assistant/tv-volume down
+#   /Users/garrett/.config/.home-assistant/tv-volume mute
+#
+# From this folder, you can test manually with:
+#   ./tv-volume test
+#   ./tv-volume entities
+#   ./tv-volume up
+case "${1:-}" in
+  up)
+    # Android TV Remote command for volume up.
+    send_remote_command "VOLUME_UP"
+    ;;
+  down)
+    # Android TV Remote command for volume down.
+    send_remote_command "VOLUME_DOWN"
+    ;;
+  mute)
+    # Android TV Remote mute toggle. If your TV treats MUTE differently from
+    # VOLUME_MUTE, swap this to VOLUME_MUTE and retest.
+    send_remote_command "MUTE"
+    ;;
+  test)
+    # Basic Home Assistant API check.
+    # Expected output when URL/token are correct:
+    #   {"message":"API running."}
+    ha_get "/api/" | tr -d '\n'
+    printf '\n'
+    ;;
+  entities)
+    # List likely entities so you do not have to dig through the HA UI.
+    #
+    # remote.* is what this script needs for TV button commands.
+    # media_player.* is printed only as context because HA creates one too.
+    #
+    # python3 is used here because macOS has no reliable built-in JSON query
+    # tool, and parsing JSON with grep/sed would be fragile.
+    ha_get "/api/states" | python3 -c 'import json,sys
+data=json.load(sys.stdin)
+for item in data:
+    entity=item.get("entity_id", "")
+    if entity.startswith(("remote.", "media_player.")):
+        name=item.get("attributes", {}).get("friendly_name", "")
+        print(f"{entity}\t{name}")'
+    ;;
+  *)
+    usage
+    ;;
+esac
