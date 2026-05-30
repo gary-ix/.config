@@ -61,6 +61,8 @@
 
 # Scripts
 !scripts/
+!scripts/lib/
+!scripts/lib/**
 !scripts/mac-only/
 !scripts/mac-only/**
 !scripts/setup-file-associations.sh
