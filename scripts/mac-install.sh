@@ -7,6 +7,7 @@ LIB_DIR="$SCRIPT_DIR/lib"
 HOME_DIR="${HOME:-}"
 
 . "$LIB_DIR/logging.sh"
+. "$LIB_DIR/utils.sh"
 . "$LIB_DIR/node-dev-setup.sh"
 . "$LIB_DIR/zsh-setup.sh"
 
@@ -26,7 +27,7 @@ ensure_not_root() {
 }
 
 load_homebrew() {
-  if command -v brew >/dev/null 2>&1; then
+  if has_command brew; then
     return
   fi
 
@@ -42,7 +43,7 @@ load_homebrew() {
 
 install_homebrew() {
   load_homebrew
-  if command -v brew >/dev/null 2>&1; then
+  if has_command brew; then
     log_info 'Homebrew already installed.'
     return
   fi
@@ -51,7 +52,7 @@ install_homebrew() {
   NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   load_homebrew
 
-  if ! command -v brew >/dev/null 2>&1; then
+  if ! has_command brew; then
     log_error 'Homebrew install completed, but brew was not found in PATH.'
     log_error 'Run one of these and retry:'
     log_error '  eval "$(/opt/homebrew/bin/brew shellenv)"'
@@ -63,7 +64,7 @@ install_homebrew() {
 }
 
 install_github_cli() {
-  if command -v gh >/dev/null 2>&1; then
+  if has_command gh; then
     log_info 'GitHub CLI already installed.'
     return
   fi

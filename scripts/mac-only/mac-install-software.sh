@@ -6,9 +6,10 @@ LIB_DIR="$SCRIPT_DIR/../lib"
 
 . "$LIB_DIR/logging.sh"
 . "$LIB_DIR/interactive.sh"
+. "$LIB_DIR/utils.sh"
 
 load_homebrew() {
-  if command -v brew >/dev/null 2>&1; then
+  if has_command brew; then
     return
   fi
 
@@ -25,7 +26,7 @@ load_homebrew() {
 install_cask() {
   local cask_name="$1"
 
-  if brew list --cask "$cask_name" >/dev/null 2>&1; then
+  if brew_has_cask "$cask_name"; then
     log_info "$cask_name already installed."
     return
   fi
@@ -38,7 +39,7 @@ install_cask() {
 install_formula() {
   local formula_name="$1"
 
-  if brew list --formula "$formula_name" >/dev/null 2>&1; then
+  if brew_has_formula "$formula_name"; then
     log_info "$formula_name already installed."
     return
   fi
@@ -54,12 +55,12 @@ install_tailscale() {
 
   case "$choice" in
     1)
-      if brew list --formula tailscale >/dev/null 2>&1; then
+      if brew_has_formula tailscale; then
         log_info 'Tailscale CLI already installed.'
         return
       fi
 
-      if brew list --cask tailscale-app >/dev/null 2>&1; then
+      if brew_has_cask tailscale-app; then
         log_info 'Removing tailscale-app so the boot-time daemon can be used instead.'
         brew uninstall --cask tailscale-app
       fi
@@ -77,12 +78,12 @@ install_tailscale() {
       log_info 'Run sudo tailscale up to authenticate this Mac if it is not already connected.'
       ;;
     2)
-      if brew list --cask tailscale-app >/dev/null 2>&1; then
+      if brew_has_cask tailscale-app; then
         log_info 'Tailscale app already installed.'
         return
       fi
 
-      if brew list --formula tailscale >/dev/null 2>&1; then
+      if brew_has_formula tailscale; then
         log_info 'Removing tailscale CLI so the GUI app can be used instead.'
         brew uninstall tailscale
       fi
@@ -93,7 +94,7 @@ install_tailscale() {
 }
 
 install_opencode_desktop() {
-  if brew list --cask opencode-desktop >/dev/null 2>&1; then
+  if brew_has_cask opencode-desktop; then
     log_info 'opencode-desktop already installed.'
     return
   fi
@@ -109,7 +110,7 @@ install_opencode_desktop() {
 ensure_brew_available() {
   load_homebrew
 
-  if ! command -v brew >/dev/null 2>&1; then
+  if ! has_command brew; then
     log_error 'Homebrew is required to install Mac software.'
     log_error 'Run scripts/mac-install.sh first to install Homebrew.'
     exit 1

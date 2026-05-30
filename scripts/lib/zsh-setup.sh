@@ -3,7 +3,7 @@
 run_privileged() {
   if [[ "$(id -u)" -eq 0 ]]; then
     "$@"
-  elif command -v sudo >/dev/null 2>&1; then
+  elif has_command sudo; then
     sudo "$@"
   else
     "$@"
@@ -25,18 +25,18 @@ zsh_setup() {
     exit 1
   fi
 
-  if ! command -v zsh >/dev/null 2>&1; then
+  if ! has_command zsh; then
     log_info 'Installing zsh with Homebrew...'
     brew install zsh
   else
     log_info 'zsh already installed.'
   fi
 
-  if ! command -v git >/dev/null 2>&1; then
+  if ! has_command git; then
     log_info 'Installing git with Homebrew...'
     brew install git
 
-    if ! command -v git >/dev/null 2>&1; then
+    if ! has_command git; then
       log_error 'git is required for zsh setup but is not installed.'
       exit 1
     fi
@@ -100,7 +100,7 @@ zsh_setup() {
   fi
 
   if [[ "${SHELL:-}" != "$zsh_path" ]]; then
-    if chsh -s "$zsh_path" >/dev/null 2>&1; then
+    if silent chsh -s "$zsh_path"; then
       log_info "Set default shell to $zsh_path"
     else
       log_info "Could not set default shell automatically. Run: chsh -s \"$zsh_path\""
