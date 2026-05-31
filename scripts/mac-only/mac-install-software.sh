@@ -5,9 +5,11 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 LIB_DIR="$SCRIPT_DIR/../lib"
 
 . "$LIB_DIR/logging.sh"
+. "$LIB_DIR/interactive.sh"
+. "$LIB_DIR/utils.sh"
 
 load_homebrew() {
-  if command -v brew >/dev/null 2>&1; then
+  if has_command brew; then
     return
   fi
 
@@ -24,7 +26,7 @@ load_homebrew() {
 install_cask() {
   local cask_name="$1"
 
-  if brew list --cask "$cask_name" >/dev/null 2>&1; then
+  if brew_has_cask "$cask_name"; then
     log_info "$cask_name already installed."
     return
   fi
@@ -37,7 +39,7 @@ install_cask() {
 install_formula() {
   local formula_name="$1"
 
-  if brew list --formula "$formula_name" >/dev/null 2>&1; then
+  if brew_has_formula "$formula_name"; then
     log_info "$formula_name already installed."
     return
   fi
@@ -47,27 +49,72 @@ install_formula() {
   log_info "$formula_name installed."
 }
 
-install_tailscale_service() {
-  if brew list --cask tailscale-app >/dev/null 2>&1; then
-    log_info 'Removing tailscale-app so the boot-time daemon can be used instead.'
-    brew uninstall --cask tailscale-app
-  fi
+install_tailscale() {
+  local choice
+  choice="$(interactive_select 'How do you want to install Tailscale?' 'CLI (system service)' 'App (GUI)' 'Skip')"
 
-  install_formula tailscale
+  case "$choice" in
+    1)
+      if brew_has_formula tailscale; then
+        log_info 'Tailscale CLI already installed.'
+        return
+      fi
 
-  if sudo brew services list | grep -Eq '^tailscale\s+started\b'; then
-    log_info 'tailscale service already started.'
-    return
-  fi
+      if brew_has_cask tailscale-app; then
+        log_info 'Removing tailscale-app so the boot-time daemon can be used instead.'
+        brew uninstall --cask tailscale-app
+      fi
 
-  log_info 'Starting tailscale system service...'
-  sudo brew services start tailscale
-  log_info 'tailscale system service started.'
-  log_info 'Run sudo tailscale up to authenticate this Mac if it is not already connected.'
+      install_formula tailscale
+
+      if sudo brew services list | grep -Eq '^tailscale\s+started\b'; then
+        log_info 'tailscale service already started.'
+        return
+      fi
+
+      log_info 'Starting tailscale system service...'
+      sudo brew services start tailscale
+      log_info 'tailscale system service started.'
+      log_info 'Run sudo tailscale up to authenticate this Mac if it is not already connected.'
+      ;;
+    2)
+      if brew_has_cask tailscale-app; then
+        log_info 'Tailscale app already installed.'
+        return
+      fi
+
+      if brew_has_formula tailscale; then
+        log_info 'Removing tailscale CLI so the GUI app can be used instead.'
+
+        if sudo brew services list | grep -Eq '^tailscale\s+started\b'; then
+          log_info 'Stopping tailscale system service...'
+          sudo brew services stop tailscale || true
+        fi
+
+        if brew uninstall tailscale; then
+          log_info 'Tailscale CLI uninstalled.'
+        else
+          log_info 'brew uninstall failed, cleaning up manually...'
+          local tailscale_cellar
+          tailscale_cellar="$(brew --cellar tailscale)"
+          if [[ -n "$tailscale_cellar" && -d "$tailscale_cellar" ]]; then
+            sudo rm -rf "$tailscale_cellar"
+            log_info 'Removed tailscale cellar manually.'
+          fi
+          brew cleanup tailscale || true
+        fi
+      fi
+
+      install_cask tailscale-app
+      ;;
+    3)
+      log_info 'Skipping Tailscale install.'
+      ;;
+  esac
 }
 
 install_opencode_desktop() {
-  if brew list --cask opencode-desktop >/dev/null 2>&1; then
+  if brew_has_cask opencode-desktop; then
     log_info 'opencode-desktop already installed.'
     return
   fi
@@ -83,7 +130,7 @@ install_opencode_desktop() {
 ensure_brew_available() {
   load_homebrew
 
-  if ! command -v brew >/dev/null 2>&1; then
+  if ! has_command brew; then
     log_error 'Homebrew is required to install Mac software.'
     log_error 'Run scripts/mac-install.sh first to install Homebrew.'
     exit 1
@@ -95,7 +142,7 @@ main() {
   run_step 'Install Ghostty' install_cask ghostty
   run_step 'Install Karabiner-Elements' install_cask karabiner-elements
   run_step 'Install BetterDisplay' install_cask betterdisplay
-  run_step 'Install Tailscale' install_tailscale_service
+  run_step 'Install Tailscale' install_tailscale
   run_step 'Install balenaEtcher' install_cask balenaetcher
   run_step 'Install Raycast' install_cask raycast
   run_step 'Install Visual Studio Code' install_cask visual-studio-code

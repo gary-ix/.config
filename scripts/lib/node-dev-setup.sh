@@ -11,7 +11,7 @@ load_nvm() {
 
 install_nvm() {
   load_nvm
-  if command -v nvm >/dev/null 2>&1; then
+  if has_command nvm; then
     log_info 'nvm already installed.'
     return
   fi
@@ -20,7 +20,7 @@ install_nvm() {
   curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
   load_nvm
 
-  if ! command -v nvm >/dev/null 2>&1; then
+  if ! has_command nvm; then
     log_error 'nvm install completed, but nvm is not available in this shell.'
     log_error 'Open a new terminal and run: nvm install --lts'
     exit 1
@@ -32,7 +32,7 @@ install_nvm() {
 node_dev_setup() {
   install_nvm
 
-  if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
+  if has_command node && has_command npm; then
     log_info 'Node.js and npm already installed.'
     return
   fi
