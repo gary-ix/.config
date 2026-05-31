@@ -150,6 +150,7 @@ main() {
   run_step 'Install Codex' install_cask codex-app
   run_step 'Install OpenCode Desktop' install_opencode_desktop
   run_step 'Install Docker Desktop' install_cask docker-desktop
+  run_step 'Install UTM' install_cask utm
   run_step 'Install Google Chrome' install_cask google-chrome
   run_step 'Install Firefox' install_cask firefox
   run_step 'Install Zen Browser' install_cask zen
