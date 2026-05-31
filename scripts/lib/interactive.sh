@@ -19,15 +19,15 @@ interactive_select() {
     return 1
   fi
 
-  log_info "$question"
+  printf '%s\n' "$question" >/dev/tty
   local i=1
   for option in "${options[@]}"; do
-    log_info "  $i) $option"
+    printf '  %d) %s\n' "$i" "$option" >/dev/tty
     ((i++))
   done
 
   while true; do
-    printf 'Enter choice (1-%d): ' "${#options[@]}"
+    printf 'Enter choice (1-%d): ' "${#options[@]}" >/dev/tty
     read -r choice
     if [[ "$choice" =~ ^[0-9]+$ ]] && ((choice >= 1 && choice <= ${#options[@]})); then
       printf '%s\n' "$choice"

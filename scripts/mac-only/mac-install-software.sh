@@ -51,7 +51,7 @@ install_formula() {
 
 install_tailscale() {
   local choice
-  choice="$(interactive_select 'How do you want to install Tailscale?' 'CLI (system service)' 'App (GUI)')"
+  choice="$(interactive_select 'How do you want to install Tailscale?' 'CLI (system service)' 'App (GUI)' 'Skip')"
 
   case "$choice" in
     1)
@@ -85,10 +85,30 @@ install_tailscale() {
 
       if brew_has_formula tailscale; then
         log_info 'Removing tailscale CLI so the GUI app can be used instead.'
-        brew uninstall tailscale
+
+        if sudo brew services list | grep -Eq '^tailscale\s+started\b'; then
+          log_info 'Stopping tailscale system service...'
+          sudo brew services stop tailscale || true
+        fi
+
+        if brew uninstall tailscale; then
+          log_info 'Tailscale CLI uninstalled.'
+        else
+          log_info 'brew uninstall failed, cleaning up manually...'
+          local tailscale_cellar
+          tailscale_cellar="$(brew --cellar tailscale)"
+          if [[ -n "$tailscale_cellar" && -d "$tailscale_cellar" ]]; then
+            sudo rm -rf "$tailscale_cellar"
+            log_info 'Removed tailscale cellar manually.'
+          fi
+          brew cleanup tailscale || true
+        fi
       fi
 
       install_cask tailscale-app
+      ;;
+    3)
+      log_info 'Skipping Tailscale install.'
       ;;
   esac
 }
