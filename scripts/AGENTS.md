@@ -13,6 +13,7 @@ This directory contains installation and configuration scripts for macOS.
 - `lib/` — Shared shell helpers (`logging.sh`, `interactive.sh`, `utils.sh`)
 - `mac-only/` — macOS-specific settings and software installs
 - `mac-install.sh` — Main macOS setup entrypoint
+  - Includes an interactive power mode step (`Normal` or `Server`) applied via `mac-only/mac-power-mode.ts`
 - `mac-uninstall.sh` — macOS teardown
 
 ## Conventions
