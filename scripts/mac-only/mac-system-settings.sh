@@ -518,6 +518,32 @@ configure_software_updates() {
   log_info 'Software updates configured to download only (not auto-install).'
 }
 
+disable_apple_intelligence() {
+  defaults write com.apple.Siri AppleIntelligenceEnabled -bool false
+  defaults write com.apple.Siri LLMEnable -bool false
+
+  silent killall Siri || true
+  silent killall SystemUIServer || true
+
+  log_info 'Apple Intelligence disabled.'
+}
+
+disable_siri() {
+  defaults write com.apple.assistant.support 'Assistant Enabled' -bool false
+  defaults write com.apple.Siri StatusMenuVisible -bool false
+  defaults write com.apple.Siri UserHasDeclinedEnable -bool true
+  defaults write com.apple.assistant.support 'Siri Data Sharing Opt-In Status' -int 2
+  defaults write com.apple.SetupAssistant 'DidSeeSiriSetup' -bool true
+
+  silent killall Siri || true
+  silent killall SystemUIServer || true
+
+  log_info 'Siri disabled.'
+  log_info 'Siri menu bar icon hidden.'
+  log_info 'Siri setup prompt suppressed.'
+  log_info 'Siri data sharing opted out.'
+}
+
 configure_menu_bar() {
   defaults write NSGlobalDomain _HIHideMenuBar -bool false
   defaults write NSGlobalDomain NSRecentDocumentsLimit -int 0
@@ -536,6 +562,8 @@ configure_menu_bar() {
 main() {
   run_step 'Set Black Wallpaper and Screen Saver' set_black_wallpaper_and_screensaver
   run_step 'Disable Handoff' disable_handoff
+  run_step 'Disable Apple Intelligence' disable_apple_intelligence
+  run_step 'Disable Siri' disable_siri
   run_step 'Configure Trackpad' configure_trackpad
   run_step 'Configure Keyboard Repeat' configure_keyboard_repeat
   run_step 'Install File Associations' mac_file_associations
