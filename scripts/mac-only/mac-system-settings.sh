@@ -544,6 +544,58 @@ disable_siri() {
   log_info 'Siri data sharing opted out.'
 }
 
+configure_control_center() {
+  # Module visibility in Control Center / Menu Bar (ByHost plist)
+  defaults -currentHost write com.apple.controlcenter Battery -int 8
+  defaults -currentHost write com.apple.controlcenter BatteryShowPercentage -int 0
+  defaults -currentHost write com.apple.controlcenter Bluetooth -int 24
+  defaults -currentHost write com.apple.controlcenter Display -int 8
+  defaults -currentHost write com.apple.controlcenter FocusModes -int 8
+  defaults -currentHost write com.apple.controlcenter KeyboardBrightness -int 8
+  defaults -currentHost write com.apple.controlcenter NowPlaying -int 8
+  defaults -currentHost write com.apple.controlcenter ScreenMirroring -int 8
+  defaults -currentHost write com.apple.controlcenter Sound -int 8
+  defaults -currentHost write com.apple.controlcenter TimeMachine -int 8
+  defaults -currentHost write com.apple.controlcenter VoiceControl -int 8
+  defaults -currentHost write com.apple.controlcenter WiFi -int 8
+
+  # NSStatusItem visibility in menu bar (main plist)
+  defaults write com.apple.controlcenter "NSStatusItem Visible AirDrop" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem Visible Battery" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem Visible BentoBox" -bool true
+  defaults write com.apple.controlcenter "NSStatusItem Visible Bluetooth" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem Visible FaceTime" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem Visible FocusModes" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem Visible Item-0" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem Visible Item-1" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem Visible Item-2" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem Visible Item-3" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem Visible Item-4" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem Visible Item-5" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem Visible Item-6" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem Visible Item-7" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem Visible Item-8" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem Visible Item-9" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem Visible ScreenMirroring" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem Visible Shortcuts" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem Visible Sound" -bool false
+  defaults write com.apple.controlcenter "NSStatusItem VisibleCC BentoBox-0" -bool true
+  defaults write com.apple.controlcenter "NSStatusItem VisibleCC Clock" -bool true
+
+  defaults write com.apple.controlcenter AutoHideMenuBarOption -int 3
+
+  # Hide Spotlight search icon from menu bar
+  defaults -currentHost write com.apple.Spotlight MenuItemHidden -int 1
+
+  silent killall Spotlight || true
+  silent killall SystemUIServer || true
+
+  log_info 'Control Center configured to hide most system icons from menu bar.'
+  log_info 'Weather widget (BentoBox) enabled in menu bar.'
+  log_info 'Battery percentage hidden.'
+  log_info 'Spotlight icon hidden from menu bar.'
+}
+
 configure_menu_bar() {
   defaults write NSGlobalDomain _HIHideMenuBar -bool false
   defaults write NSGlobalDomain NSRecentDocumentsLimit -int 0
@@ -575,6 +627,7 @@ main() {
   run_step 'Configure Widgets' configure_widgets
   run_step 'Configure Stage Manager' configure_stage_manager
   run_step 'Configure Software Updates' configure_software_updates
+  run_step 'Configure Control Center' configure_control_center
   run_step 'Configure Menu Bar' configure_menu_bar
 }
 
