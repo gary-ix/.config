@@ -60,11 +60,84 @@ disable_handoff() {
 }
 
 configure_trackpad() {
-  defaults write -g com.apple.trackpad.scaling -float 5
+  # Tracking speed: 3 is the fastest setting in macOS
+  defaults write -g com.apple.trackpad.scaling -float 3
+
+  # Built-in trackpad settings
+  defaults write com.apple.AppleMultitouchTrackpad FirstClickThreshold -int 0
+  defaults write com.apple.AppleMultitouchTrackpad ActuationEnabled -bool false
+  defaults write com.apple.AppleMultitouchTrackpad ForceSuppressed -bool true
+  defaults write com.apple.AppleMultitouchTrackpad ActuateDetents -bool false
+  defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -bool true
+  defaults write com.apple.AppleMultitouchTrackpad TrackpadCornerSecondaryClick -int 0
+  defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
+  defaults write com.apple.AppleMultitouchTrackpad TrackpadScroll -bool false
+  defaults write com.apple.AppleMultitouchTrackpad TrackpadPinch -bool false
+  defaults write com.apple.AppleMultitouchTrackpad TrackpadTwoFingerDoubleTapGesture -bool false
+  defaults write com.apple.AppleMultitouchTrackpad TrackpadRotate -bool false
+  defaults write com.apple.AppleMultitouchTrackpad TrackpadTwoFingerFromRightEdgeSwipeGesture -int 0
+  defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerHorizSwipeGesture -int 2
+  defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerHorizSwipeGesture -int 0
+  defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerVertSwipeGesture -int 0
+  defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerVertSwipeGesture -int 2
+  defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerPinchGesture -int 0
+  defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerTapGesture -int 0
+
+  # External Magic Trackpad settings
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad FirstClickThreshold -int 0
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad ActuationEnabled -bool false
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad ForceSuppressed -bool true
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad ActuateDetents -bool false
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRightClick -bool true
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadCornerSecondaryClick -int 0
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadScroll -bool false
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadPinch -bool false
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadTwoFingerDoubleTapGesture -bool false
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRotate -bool false
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadTwoFingerFromRightEdgeSwipeGesture -int 0
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerHorizSwipeGesture -int 2
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerHorizSwipeGesture -int 0
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerVertSwipeGesture -int 0
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerVertSwipeGesture -int 2
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerPinchGesture -int 0
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerTapGesture -int 0
+
+  # Global gesture settings
+  defaults write NSGlobalDomain AppleEnableSwipeNavigateWithScrolls -bool false
+  defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
+  defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+
+  # Gesture on/off toggles are handled by Dock settings
+  defaults write com.apple.dock showMissionControlGestureEnabled -bool true
+  defaults write com.apple.dock showAppExposeGestureEnabled -bool false
+  defaults write com.apple.dock showDesktopGestureEnabled -bool false
+
+  # Apply trackpad settings immediately
+  if [[ -x /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings ]]; then
+    silent /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u || true
+  fi
+
   silent killall Dock || true
   silent killall SystemUIServer || true
 
-  log_info 'Trackpad tracking speed set to 5.'
+  log_info 'Trackpad tracking speed set to fastest (3).'
+  log_info 'Trackpad click set to light.'
+  log_info 'Trackpad quiet click disabled.'
+  log_info 'Trackpad force click and haptic feedback disabled.'
+  log_info 'Trackpad look up and data detectors disabled.'
+  log_info 'Trackpad secondary click set to two fingers.'
+  log_info 'Trackpad tap to click enabled.'
+  log_info 'Natural scrolling disabled.'
+  log_info 'Pinch to zoom disabled.'
+  log_info 'Smart zoom disabled.'
+  log_info 'Rotate gesture disabled.'
+  log_info 'Swipe between pages disabled.'
+  log_info 'Swipe between full-screen apps set to three fingers.'
+  log_info 'Notification Center swipe disabled.'
+  log_info 'Mission Control set to four-finger swipe up.'
+  log_info 'App Expose gesture disabled.'
+  log_info 'Show desktop gesture disabled.'
 }
 
 configure_keyboard_repeat() {
@@ -345,24 +418,16 @@ configure_dock() {
   local codex_app
   local vscodium_app
   local zen_app
-  local choice
 
-  choice="$(interactive_select 'Should the Dock be visible or autohide?' 'Skip' 'Visible (always show)' 'Autohide')"
+  defaults write com.apple.dock orientation -string bottom
+  defaults write com.apple.dock mineffect -string scale
+  defaults write com.apple.dock minimize-to-application -bool false
+  defaults write com.apple.dock autohide -bool true
+  defaults write com.apple.dock launchanim -bool false
+  defaults write com.apple.dock show-process-indicators -bool true
+  defaults write com.apple.dock show-recents -bool false
 
-  case "$choice" in
-    0)
-      log_info 'Skipping Dock configuration.'
-      return
-      ;;
-    1)
-      defaults write com.apple.dock autohide -bool false
-      log_info 'Dock set to always show.'
-      ;;
-    2)
-      defaults write com.apple.dock autohide -bool true
-      log_info 'Dock set to autohide.'
-      ;;
-  esac
+  defaults write NSGlobalDomain AppleActionOnDoubleClick -string Maximize
 
   defaults write com.apple.dock tilesize -int 32
   defaults write com.apple.dock largesize -int 64
@@ -396,9 +461,16 @@ configure_dock() {
   add_dock_app "$zen_app"
 
   defaults write com.apple.dock persistent-others -array
-  defaults write com.apple.dock show-recents -bool false
   silent killall Dock || true
 
+  log_info 'Dock position set to bottom.'
+  log_info 'Dock minimize effect set to scale.'
+  log_info 'Window title bar double-click set to maximize/fill.'
+  log_info 'Dock configured to not minimize windows into application icons.'
+  log_info 'Dock configured to autohide.'
+  log_info 'Dock application launch animation disabled.'
+  log_info 'Dock open application indicators enabled.'
+  log_info 'Dock recents section disabled.'
   log_info 'Dock icon size set to 32 px (~25%).'
   log_info 'Dock magnification size set to 64 px (~50%).'
   log_info 'Dock updated with the requested app order, no downloads stack, and no recent apps section.'
@@ -412,6 +484,55 @@ set_black_wallpaper_and_screensaver() {
   set_black_screensaver "$image_path"
 }
 
+configure_widgets() {
+  defaults write com.apple.WindowManager StandardHideWidgets -int 1
+  defaults write com.apple.WindowManager StageManagerHideWidgets -int 1
+
+  silent killall Dock || true
+
+  log_info 'Widgets hidden on desktop.'
+  log_info 'Widgets hidden in Stage Manager.'
+}
+
+configure_stage_manager() {
+  defaults write com.apple.WindowManager GloballyEnabled -bool false
+
+  silent killall Dock || true
+
+  log_info 'Stage Manager disabled.'
+}
+
+configure_software_updates() {
+  if ! sudo -v; then
+    log_error 'Unable to acquire sudo privileges for software update setup.'
+    return
+  fi
+
+  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticCheckEnabled -bool true
+  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticDownload -bool true
+  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticallyInstallMacOSUpdates -bool false
+  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist ConfigDataInstall -bool false
+  sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist CriticalUpdateInstall -bool false
+  sudo defaults write /Library/Preferences/com.apple.commerce.plist AutoUpdate -bool false
+
+  log_info 'Software updates configured to download only (not auto-install).'
+}
+
+configure_menu_bar() {
+  defaults write NSGlobalDomain _HIHideMenuBar -bool false
+  defaults write NSGlobalDomain NSRecentDocumentsLimit -int 0
+
+  # 'Show menu bar background' is a newer macOS setting (Tahoe 26+) and its
+  # exact defaults key is not yet documented for command-line use.
+  # The legacy key below may not have an effect on newer releases.
+  silent defaults write NSGlobalDomain AppleEnableMenuBarTransparency -bool true || true
+
+  silent killall SystemUIServer || true
+
+  log_info 'Menu bar configured to never hide.'
+  log_info 'Recent documents, applications, and servers set to none.'
+}
+
 main() {
   run_step 'Set Black Wallpaper and Screen Saver' set_black_wallpaper_and_screensaver
   run_step 'Disable Handoff' disable_handoff
@@ -423,6 +544,10 @@ main() {
   run_step 'Configure Remote Access' configure_remote_access
   run_step 'Configure Finder Sidebar' configure_finder_sidebar
   run_step 'Configure Dock' configure_dock
+  run_step 'Configure Widgets' configure_widgets
+  run_step 'Configure Stage Manager' configure_stage_manager
+  run_step 'Configure Software Updates' configure_software_updates
+  run_step 'Configure Menu Bar' configure_menu_bar
 }
 
 main "$@"
