@@ -155,6 +155,14 @@ main() {
   run_step 'Install Firefox' install_cask firefox
   run_step 'Install Zen Browser' install_cask zen
   run_step 'Install Discord' install_cask discord
+  run_step 'Install Homerow' install_cask homerow
+  run_step 'Install GIMP' install_cask gimp
+  run_step 'Install Neofetch' install_formula neofetch
+  run_step 'Install Neovim' install_formula neovim
+  run_step 'Install VoiceInk' install_cask voiceink
+  run_step 'Install Thock' install_cask thock
+  run_step 'Install TG Pro' install_cask tg-pro
+  run_step 'Install iStat Menus' install_cask istat-menus
 }
 
 main "$@"
