@@ -67,8 +67,7 @@
 !scripts/lib/**
 !scripts/mac-only/
 !scripts/mac-only/**
-!scripts/setup-file-associations.sh
-!scripts/mac-only/mac-power-mode.ts
+!scripts/mac-only/install/mac-power-mode.ts
 !scripts/mac-install.sh
 !scripts/mac-uninstall.sh
 !scripts/vscode-install.sh

@@ -637,7 +637,7 @@ function main() {
 	}
 
 	console.error(
-		"Usage: tsx scripts/mac-only/mac-power-mode.ts <current|normal|server>",
+		"Usage: tsx scripts/mac-only/install/mac-power-mode.ts <current|normal|server>",
 	);
 	process.exit(1);
 }

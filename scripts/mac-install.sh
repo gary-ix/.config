@@ -76,7 +76,7 @@ install_github_cli() {
 }
 
 set_mac_system_settings() {
-  local script_path="$SCRIPT_DIR/mac-only/mac-system-settings.sh"
+  local script_path="$SCRIPT_DIR/mac-only/install/mac-system-settings.sh"
 
   if [[ ! -f "$script_path" ]]; then
     log_error "Missing mac system settings script: $script_path"
@@ -87,7 +87,7 @@ set_mac_system_settings() {
 }
 
 install_mac_software() {
-  local script_path="$SCRIPT_DIR/mac-only/mac-install-software.sh"
+  local script_path="$SCRIPT_DIR/mac-only/install/mac-install-software.sh"
 
   if [[ ! -f "$script_path" ]]; then
     log_error "Missing mac software install script: $script_path"
@@ -156,7 +156,7 @@ configure_power_mode() {
       fi
 
       log_info 'Applying normal power mode...'
-      sudo npx tsx "$ROOT_DIR/scripts/mac-only/mac-power-mode.ts" normal
+      sudo npx tsx "$ROOT_DIR/scripts/mac-only/install/mac-power-mode.ts" normal
       log_info 'Normal power mode applied.'
       ;;
     2)
@@ -166,7 +166,7 @@ configure_power_mode() {
       fi
 
       log_info 'Applying server power mode...'
-      sudo npx tsx "$ROOT_DIR/scripts/mac-only/mac-power-mode.ts" server
+      sudo npx tsx "$ROOT_DIR/scripts/mac-only/install/mac-power-mode.ts" server
       log_info 'Server power mode applied.'
       ;;
   esac
