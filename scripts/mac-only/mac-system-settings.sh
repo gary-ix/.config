@@ -6,6 +6,7 @@ LIB_DIR="$SCRIPT_DIR/../lib"
 
 . "$LIB_DIR/logging.sh"
 . "$LIB_DIR/interactive.sh"
+. "$LIB_DIR/utils.sh"
 
 create_black_background_image() {
   local image_path='/System/Library/Desktop Pictures/Solid Colors/Black.png'
@@ -52,16 +53,16 @@ set_black_screensaver() {
 disable_handoff() {
   defaults -currentHost write com.apple.coreservices.useractivityd ActivityAdvertisingAllowed -bool false
   defaults -currentHost write com.apple.coreservices.useractivityd ActivityReceivingAllowed -bool false
-  killall useractivityd >/dev/null 2>&1 || true
-  killall Dock >/dev/null 2>&1 || true
+  silent killall useractivityd || true
+  silent killall Dock || true
 
   log_info 'Handoff disabled.'
 }
 
 configure_trackpad() {
   defaults write -g com.apple.trackpad.scaling -float 5
-  killall Dock >/dev/null 2>&1 || true
-  killall SystemUIServer >/dev/null 2>&1 || true
+  silent killall Dock || true
+  silent killall SystemUIServer || true
 
   log_info 'Trackpad tracking speed set to 5.'
 }
@@ -101,7 +102,7 @@ configure_finder_preferences() {
   defaults write com.apple.finder NewWindowTarget -string 'PfHm'
   defaults write com.apple.finder NewWindowTargetPath -string "file://${home_dir}/"
 
-  killall Finder >/dev/null 2>&1 || true
+  silent killall Finder || true
 
   log_info 'Finder configured to show filename extensions.'
   log_info 'Finder configured to remove trash items after 30 days.'
@@ -117,30 +118,30 @@ _apply_remote_access() {
     exit 1
   fi
 
-  if ! sudo launchctl enable system/com.openssh.sshd >/dev/null 2>&1; then
+  # SSH (Remote Login)
+  if ! silent sudo launchctl enable system/com.openssh.sshd; then
     log_error 'Failed to enable Remote Login (SSH) service.'
     log_error 'Enable it manually in System Settings > General > Sharing > Remote Login.'
     exit 1
   fi
 
-  sudo launchctl bootstrap system /System/Library/LaunchDaemons/ssh.plist >/dev/null 2>&1 || true
-  sudo launchctl kickstart -k system/com.openssh.sshd >/dev/null 2>&1 || true
+  silent sudo launchctl load -w /System/Library/LaunchDaemons/ssh.plist || true
 
-  if ! sudo launchctl print system/com.openssh.sshd >/dev/null 2>&1; then
+  if ! silent sudo launchctl print system/com.openssh.sshd; then
     log_error 'Remote Login (SSH) could not be verified as enabled.'
     log_error 'Enable it manually in System Settings > General > Sharing > Remote Login.'
     exit 1
   fi
 
-  if ! sudo launchctl enable system/com.apple.screensharing; then
+  # Screen Sharing
+  if ! silent sudo launchctl enable system/com.apple.screensharing; then
     log_error 'Failed to enable Screen Sharing service.'
     exit 1
   fi
 
-  sudo launchctl bootstrap system /System/Library/LaunchDaemons/com.apple.screensharing.plist >/dev/null 2>&1 || true
-  sudo launchctl kickstart -k system/com.apple.screensharing >/dev/null 2>&1 || true
+  silent sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.screensharing.plist || true
 
-  if ! sudo launchctl print system/com.apple.screensharing >/dev/null 2>&1; then
+  if ! silent sudo launchctl print system/com.apple.screensharing; then
     log_error 'Screen Sharing service could not be verified as loaded.'
     log_error 'Enable it manually in System Settings > General > Sharing > Screen Sharing.'
     exit 1
@@ -148,6 +149,49 @@ _apply_remote_access() {
 
   log_info 'Remote Login (SSH) enabled.'
   log_info 'Screen Sharing enabled for native macOS login-window access.'
+}
+
+configure_headless_access() {
+  local filevault_status
+
+  filevault_status="$(fdesetup status 2>/dev/null || echo 'unknown')"
+
+  log_info 'Headless remote access (Screen Sharing after reboot without local login)'
+  log_info 'requires FileVault to be OFF.'
+
+  if [[ "$filevault_status" == *"FileVault is On."* ]]; then
+    log_info 'FileVault is currently ON.'
+    log_info 'With FileVault enabled, macOS cannot start network services after a reboot'
+    log_info 'until someone physically enters the password at the pre-boot unlock screen.'
+
+    local choice
+    choice="$(interactive_select 'Disable FileVault to allow remote Screen Sharing after reboot?' 'Skip (keep FileVault on)' 'Yes, disable FileVault')"
+
+    case "$choice" in
+      1)
+        if ! sudo -v; then
+          log_error 'Unable to acquire sudo privileges to disable FileVault.'
+          return
+        fi
+        log_info 'Disabling FileVault. Decryption will run in the background; you can keep using your Mac.'
+        if sudo fdesetup disable; then
+          log_info 'FileVault disable initiated. Do not turn FileVault back on until decryption is complete.'
+          log_info 'You can check progress in System Settings > Privacy & Security > FileVault.'
+        else
+          log_error 'Failed to disable FileVault.'
+          log_error 'Please disable it manually: System Settings > Privacy & Security > FileVault.'
+          return
+        fi
+        ;;
+      *)
+        log_info 'Keeping FileVault ON. Screen Sharing will require a local login after each reboot.'
+        log_info 'Tip: use `sudo fdesetup authrestart` instead of a normal reboot to skip the unlock screen once.'
+        return
+        ;;
+    esac
+  else
+    log_info 'FileVault is already off.'
+  fi
 }
 
 configure_remote_access() {
@@ -165,8 +209,8 @@ configure_remote_access() {
 }
 
 open_full_disk_access_settings() {
-  /usr/bin/open 'x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles' >/dev/null 2>&1 || true
-  /usr/bin/osascript -e 'tell application "System Settings" to activate' >/dev/null 2>&1 || true
+  silent /usr/bin/open 'x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles' || true
+  silent /usr/bin/osascript -e 'tell application "System Settings" to activate' || true
 }
 
 prompt_for_full_disk_access() {
@@ -246,8 +290,8 @@ configure_finder_sidebar() {
     fi
   fi
 
-  killall sharedfilelistd >/dev/null 2>&1 || true
-  killall Finder >/dev/null 2>&1 || true
+  silent killall sharedfilelistd || true
+  silent killall Finder || true
 
   log_info "Finder sidebar pinned: $home_dir"
   log_info "Finder sidebar pinned: $config_dir"
@@ -353,7 +397,7 @@ configure_dock() {
 
   defaults write com.apple.dock persistent-others -array
   defaults write com.apple.dock show-recents -bool false
-  killall Dock >/dev/null 2>&1 || true
+  silent killall Dock || true
 
   log_info 'Dock icon size set to 32 px (~25%).'
   log_info 'Dock magnification size set to 64 px (~50%).'
@@ -375,6 +419,7 @@ main() {
   run_step 'Configure Keyboard Repeat' configure_keyboard_repeat
   run_step 'Install File Associations' mac_file_associations
   run_step 'Configure Finder Preferences' configure_finder_preferences
+  run_step 'Configure Headless Remote Access' configure_headless_access
   run_step 'Configure Remote Access' configure_remote_access
   run_step 'Configure Finder Sidebar' configure_finder_sidebar
   run_step 'Configure Dock' configure_dock
