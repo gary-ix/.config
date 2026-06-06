@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-LIB_DIR="$SCRIPT_DIR/../lib"
+LIB_DIR="$SCRIPT_DIR/../../lib"
 
 . "$LIB_DIR/logging.sh"
 . "$LIB_DIR/interactive.sh"
@@ -51,9 +51,12 @@ install_formula() {
 
 install_tailscale() {
   local choice
-  choice="$(interactive_select 'How do you want to install Tailscale?' 'CLI (system service)' 'App (GUI)' 'Skip')"
+  choice="$(interactive_select 'How do you want to install Tailscale?' 'Skip' 'CLI (system service)' 'App (GUI)')"
 
   case "$choice" in
+    0)
+      log_info 'Skipping Tailscale install.'
+      ;;
     1)
       if brew_has_formula tailscale; then
         log_info 'Tailscale CLI already installed.'
@@ -107,8 +110,19 @@ install_tailscale() {
 
       install_cask tailscale-app
       ;;
-    3)
-      log_info 'Skipping Tailscale install.'
+  esac
+}
+
+install_nordvpn() {
+  local choice
+  choice="$(interactive_select 'Install NordVPN?' 'Skip' 'Install')"
+
+  case "$choice" in
+    0)
+      log_info 'Skipping NordVPN install.'
+      ;;
+    1)
+      install_cask nordvpn
       ;;
   esac
 }
@@ -143,17 +157,26 @@ main() {
   run_step 'Install Karabiner-Elements' install_cask karabiner-elements
   run_step 'Install BetterDisplay' install_cask betterdisplay
   run_step 'Install Tailscale' install_tailscale
+  run_step 'Install NordVPN' install_nordvpn
   run_step 'Install balenaEtcher' install_cask balenaetcher
   run_step 'Install Raycast' install_cask raycast
-  run_step 'Install Visual Studio Code' install_cask visual-studio-code
   run_step 'Install VSCodium' install_cask vscodium
   run_step 'Install Codex' install_cask codex-app
   run_step 'Install OpenCode Desktop' install_opencode_desktop
   run_step 'Install Docker Desktop' install_cask docker-desktop
+  run_step 'Install UTM' install_cask utm
   run_step 'Install Google Chrome' install_cask google-chrome
   run_step 'Install Firefox' install_cask firefox
   run_step 'Install Zen Browser' install_cask zen
-  run_step 'Install Discord' install_cask discord
+  run_step 'Install Brave Browser' install_cask brave-browser
+  run_step 'Install Helium' install_cask helium
+  run_step 'Install Homerow' install_cask homerow
+  run_step 'Install GIMP' install_cask gimp
+  run_step 'Install Fastfetch' install_formula fastfetch
+  run_step 'Install Neovim' install_formula neovim
+  run_step 'Install VoiceInk' install_cask voiceink
+  run_step 'Install TG Pro' install_cask tg-pro
+  run_step 'Install iStat Menus' install_cask istat-menus
 }
 
 main "$@"

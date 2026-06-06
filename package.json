@@ -9,10 +9,7 @@
 		"theme": "tsx custom-themes/create/controller.ts",
 		"vscode-install": "bash scripts/vscode-install.sh",
 		"mac:install": "bash scripts/mac-install.sh",
-		"mac:uninstall": "bash scripts/mac-uninstall.sh",
-		"mac:power:normal": "sudo npx tsx scripts/mac-only/mac-power-mode.ts normal",
-		"mac:power:server": "sudo npx tsx scripts/mac-only/mac-power-mode.ts server",
-		"mac:power:current": "npx tsx scripts/mac-only/mac-power-mode.ts current"
+		"mac:uninstall": "bash scripts/mac-uninstall.sh"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.4",

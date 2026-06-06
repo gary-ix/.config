@@ -8,6 +8,7 @@ HOME_DIR="${HOME:-}"
 
 . "$LIB_DIR/logging.sh"
 . "$LIB_DIR/utils.sh"
+. "$LIB_DIR/interactive.sh"
 . "$LIB_DIR/node-dev-setup.sh"
 . "$LIB_DIR/zsh-setup.sh"
 
@@ -75,7 +76,7 @@ install_github_cli() {
 }
 
 set_mac_system_settings() {
-  local script_path="$SCRIPT_DIR/mac-only/mac-system-settings.sh"
+  local script_path="$SCRIPT_DIR/mac-only/install/mac-system-settings.sh"
 
   if [[ ! -f "$script_path" ]]; then
     log_error "Missing mac system settings script: $script_path"
@@ -86,7 +87,7 @@ set_mac_system_settings() {
 }
 
 install_mac_software() {
-  local script_path="$SCRIPT_DIR/mac-only/mac-install-software.sh"
+  local script_path="$SCRIPT_DIR/mac-only/install/mac-install-software.sh"
 
   if [[ ! -f "$script_path" ]]; then
     log_error "Missing mac software install script: $script_path"
@@ -140,6 +141,37 @@ configure_tmux() {
   log_info "Linked $target_config -> $source_config"
 }
 
+configure_power_mode() {
+  local choice
+  choice="$(interactive_select 'Choose a power mode configuration:' 'Skip' 'Normal' 'Server')"
+
+  case "$choice" in
+    0)
+      log_info 'Skipping power mode configuration.'
+      ;;
+    1)
+      if ! has_command npx; then
+        log_error 'npx is not available. Ensure Node.js is installed.'
+        exit 1
+      fi
+
+      log_info 'Applying normal power mode...'
+      sudo npx tsx "$ROOT_DIR/scripts/mac-only/install/mac-power-mode.ts" normal
+      log_info 'Normal power mode applied.'
+      ;;
+    2)
+      if ! has_command npx; then
+        log_error 'npx is not available. Ensure Node.js is installed.'
+        exit 1
+      fi
+
+      log_info 'Applying server power mode...'
+      sudo npx tsx "$ROOT_DIR/scripts/mac-only/install/mac-power-mode.ts" server
+      log_info 'Server power mode applied.'
+      ;;
+  esac
+}
+
 main() {
   run_step 'Validating platform' ensure_macos
   run_step 'Validating user' ensure_not_root
@@ -151,6 +183,7 @@ main() {
   run_step 'Configure tmux' configure_tmux
   run_step 'Configure Karabiner' configure_karabiner
   run_step 'Set Mac System Settings' set_mac_system_settings
+  run_step 'Configure Power Mode' configure_power_mode
   log_section 'Done'
   log_info 'mac install complete'
 }

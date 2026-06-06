@@ -7,6 +7,7 @@
 !package.json
 !package-lock.json
 !biome.json
+!AGENTS.md
 !.vscode/
 !.vscode/settings.json
 
@@ -61,12 +62,12 @@
 
 # Scripts
 !scripts/
+!scripts/AGENTS.md
 !scripts/lib/
 !scripts/lib/**
 !scripts/mac-only/
 !scripts/mac-only/**
-!scripts/setup-file-associations.sh
-!scripts/mac-only/mac-power-mode.ts
+!scripts/mac-only/install/mac-power-mode.ts
 !scripts/mac-install.sh
 !scripts/mac-uninstall.sh
 !scripts/vscode-install.sh

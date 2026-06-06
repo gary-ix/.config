@@ -11,12 +11,41 @@ fi
 echo "Setting VSCodium as default editor for code and config files..."
 
 set_handler() {
-    if ! duti -s "$VSCODIUM_BUNDLE_ID" "$1" all 2>/dev/null; then
-        # Try editor role as fallback for protected types like .html
-        if ! duti -s "$VSCODIUM_BUNDLE_ID" "$1" editor 2>/dev/null; then
-            echo "  Skipped $1 (protected by macOS)"
+    local ext="$1"
+
+    # Try setting via extension first (works for well-known UTIs)
+    if duti -s "$VSCODIUM_BUNDLE_ID" "$ext" all 2>/dev/null; then
+        return 0
+    fi
+
+    # Try editor role fallback
+    if duti -s "$VSCODIUM_BUNDLE_ID" "$ext" editor 2>/dev/null; then
+        return 0
+    fi
+
+    # For dynamic UTIs, discover the UTI from a temp file and use that
+    local tmpfile
+    tmpfile="$(mktemp "/tmp/duti-XXXXXX.${ext#.}")"
+    local uti=""
+
+    if command -v mdls &> /dev/null; then
+        uti="$(mdls -name kMDItemContentType -raw "$tmpfile" 2>/dev/null || true)"
+    fi
+
+    rm -f "$tmpfile"
+
+    if [[ -n "$uti" && "$uti" != "(null)" && "$uti" != "*" ]]; then
+        if duti -s "$VSCODIUM_BUNDLE_ID" "$uti" all 2>/dev/null; then
+            return 0
+        fi
+
+        if duti -s "$VSCODIUM_BUNDLE_ID" "$uti" editor 2>/dev/null; then
+            return 0
         fi
     fi
+
+    echo "  Skipped $ext (unable to bind UTI)"
+    return 1
 }
 
 # Code files
