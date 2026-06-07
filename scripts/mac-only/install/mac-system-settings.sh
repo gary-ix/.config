@@ -420,11 +420,25 @@ configure_dock() {
   local codex_app
   local vscodium_app
   local zen_app
+  local dock_hiding_choice
+  local dock_hiding_message='Dock hiding preference left unchanged.'
 
   defaults write com.apple.dock orientation -string bottom
   defaults write com.apple.dock mineffect -string scale
   defaults write com.apple.dock minimize-to-application -bool false
-  defaults write com.apple.dock autohide -bool true
+
+  dock_hiding_choice="$(interactive_select 'Choose Dock hiding behavior:' 'Skip (leave current setting)' 'Automatically hide and show the Dock' 'Always show the Dock')"
+  case "$dock_hiding_choice" in
+    1)
+      defaults write com.apple.dock autohide -bool true
+      dock_hiding_message='Dock configured to autohide.'
+      ;;
+    2)
+      defaults write com.apple.dock autohide -bool false
+      dock_hiding_message='Dock configured to always show.'
+      ;;
+  esac
+
   defaults write com.apple.dock launchanim -bool false
   defaults write com.apple.dock show-process-indicators -bool true
   defaults write com.apple.dock show-recents -bool false
@@ -469,7 +483,7 @@ configure_dock() {
   log_info 'Dock minimize effect set to scale.'
   log_info 'Window title bar double-click set to maximize/fill.'
   log_info 'Dock configured to not minimize windows into application icons.'
-  log_info 'Dock configured to autohide.'
+  log_info "$dock_hiding_message"
   log_info 'Dock application launch animation disabled.'
   log_info 'Dock open application indicators enabled.'
   log_info 'Dock recents section disabled.'
