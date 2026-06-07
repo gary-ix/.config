@@ -176,6 +176,7 @@ configure_finder_preferences() {
   defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool false
   defaults write com.apple.finder NewWindowTarget -string 'PfHm'
   defaults write com.apple.finder NewWindowTargetPath -string "file://${home_dir}/"
+  defaults write com.apple.finder FXPreferredViewStyle -string 'clmv'
 
   silent killall Finder || true
 
@@ -185,6 +186,7 @@ configure_finder_preferences() {
   log_info 'Finder configured to hide external disks on the desktop.'
   log_info 'Finder configured to hide CDs, DVDs, iPods, and removable media on the desktop.'
   log_info "Finder new windows configured to open $home_dir."
+  log_info 'Finder default view configured to column view.'
 }
 
 _apply_remote_access() {
