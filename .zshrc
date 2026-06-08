@@ -62,6 +62,9 @@ if (( ${+widgets[history-substring-search-up]} )); then
 fi
 bindkey '^R' history-incremental-search-backward
 
+# Print out alias
+alias aliases='grep "^alias " ~/.zshrc'
+
 # Reload zshrc
 alias reload='source ~/.zshrc'
 
